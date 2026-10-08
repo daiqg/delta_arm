@@ -38,9 +38,10 @@ python -m pip install mujoco==3.6.0
 
 ```powershell
 python verify_kinematics.py
+python verify_paddle_mount.py
 ```
 
-正常运行会输出 `CAD geometry check: 36 mesh components`，以及 FK/IK 误差、闭环残差、3 秒重力保持和工作空间扫描结果。参考量级为 FK 最大位置差约 0.025 mm、重力保持偏差约 0.030 mm。
+第一条命令会输出 `CAD geometry check: 36 mesh components`，以及 FK/IK 误差、闭环残差、3 秒重力保持和工作空间扫描结果。第二条命令在四个位姿核对球拍与末端中心的安装关系：拍柄沿世界 -Z，拍面竖直、法向世界 +X，拍心位于末端中心正下方 170 mm。
 
 查看带球拍的模型：
 
@@ -74,7 +75,7 @@ Get-Content results/traj_helix_metrics.json
 python continuous_hitting.py --nballs 10
 ```
 
-程序先标定碰撞并搜索第一球拍速，可能等待数十秒；随后在 MuJoCo 窗口中逐球演示发球、挥拍与落点，终端输出每球结果。
+程序使用已验证的固定拍速，在 MuJoCo 窗口中逐球演示发球、挥拍与落点，终端输出每球结果。
 
 **等待终端输出第 10 球后，正常关闭窗口，程序才保存本轮汇总、CSV 和最终截图。** 提前关窗会得到不完整的球数记录。随后查看：
 
@@ -84,7 +85,7 @@ Get-Content results/continuous_10_summary.json
 
 检查 `requested_balls` 和 `simulated_balls` 是否均为 10，再查看 `contacts`、`landings`、`success_100mm`。成功判据包含触球、过网检查、对方台面落点和目标误差小于 100 mm；不能只凭文件名判断完成情况。
 
-当前连续演示使用固定来球、固定目标，每球复位仿真状态。它用于重复流程验证，尚不代表随机来球或实机成功率。仓库中已有的结果文件是历史快照，运行会覆盖同名文件；请以本次程序完成后生成的数据为准。
+当前竖直拍面模型的固定来球 10 球验证结果为拍面接触 10/10、对方落台 10/10、目标成功 10/10，落点误差约 38.5 mm。演示每球复位仿真状态，且来球与拍速相同，不代表随机来球或实机成功率。运行会覆盖同名结果文件，以本次生成的数据为准。
 
 ## 6. 可选：无窗口运行
 

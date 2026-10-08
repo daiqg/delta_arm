@@ -54,23 +54,23 @@
     <geom name="net_post2" type="cylinder" pos="0 -0.9325 0.846" size="0.0075 0.086" rgba="0.15 0.15 0.17 1" contype="0" conaffinity="0" />
 
     <!-- ===== 发球机 (台端外, 视觉模型) ===== -->
-    <geom name="launcher_body" type="box" pos="1.68 0 1.02" size="0.09 0.06 0.06"
+    <geom name="launcher_body" type="box" pos="1.50 0 1.02" size="0.09 0.06 0.06"
           material="mat_launcher" contype="0" conaffinity="0" />
-    <geom name="launcher_barrel" type="cylinder" pos="1.58 0 1.02" size="0.03 0.07" euler="0 1.5708 0"
+    <geom name="launcher_barrel" type="cylinder" pos="1.40 0 1.02" size="0.03 0.07" euler="0 1.5708 0"
           rgba="0.2 0.21 0.24 1" contype="0" conaffinity="0" />
-    <geom name="launcher_post" type="cylinder" pos="1.68 0 0.4" size="0.03 0.62"
+    <geom name="launcher_post" type="cylinder" pos="1.50 0 0.4" size="0.03 0.62"
           material="mat_launcher" contype="0" conaffinity="0" />
 
     <!-- ===== 机器人安装龙门 (视觉模型) ===== -->
-    <geom name="gantry_beam" type="box" pos="-1.09 0 1.225" size="0.42 0.035 0.035"
+    <geom name="gantry_beam" type="box" pos="-1.09 0 1.695" size="0.42 0.035 0.035"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
-    <geom name="gantry_post" type="box" pos="-1.49 0 0.6225" size="0.035 0.035 0.6225"
+    <geom name="gantry_post" type="box" pos="-1.49 0 0.8475" size="0.035 0.035 0.8475"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
-    <geom name="gantry_post2" type="box" pos="-1.49 0.35 0.6225" size="0.035 0.035 0.6225"
+    <geom name="gantry_post2" type="box" pos="-1.49 0.35 0.8475" size="0.035 0.035 0.8475"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
-    <geom name="gantry_post3" type="box" pos="-1.49 -0.35 0.6225" size="0.035 0.035 0.6225"
+    <geom name="gantry_post3" type="box" pos="-1.49 -0.35 0.8475" size="0.035 0.035 0.8475"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
-    <geom name="gantry_beam2" type="box" pos="-1.49 0 1.225" size="0.035 0.385 0.035"
+    <geom name="gantry_beam2" type="box" pos="-1.49 0 1.695" size="0.035 0.385 0.035"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
 
     <!-- ===== 乒乓球 (40mm / 2.7g, 空气阻力) ===== -->

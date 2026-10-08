@@ -50,11 +50,12 @@ conda run --no-capture-output -n mujoco-sim-win python continuous_hitting.py --n
 
 ```powershell
 python verify_kinematics.py
+python verify_paddle_mount.py
 python preview_model.py
 python preview_model.py --paddle
 ```
 
-校验应输出 `CAD geometry check: 36 mesh components`，随后给出 FK/IK、闭环与重力保持结果。每个预览命令先保存截图，再打开静态 MuJoCo 窗口；关闭当前窗口后再执行下一条命令。预览不执行轨迹或击球，默认隐藏遮挡机械臂的外部安装架，仅影响显示。
+第一条校验应输出 `CAD geometry check: 36 mesh components`，随后给出 FK/IK、闭环与重力保持结果。第二条在四个位姿验证安装变换：夹具中心与 `ee_center` 重合，拍心相对其为 (0, 0, -0.170) m，拍柄沿世界 -Z，拍面法向为世界 +X。每个预览命令先保存截图，再打开静态 MuJoCo 窗口；关闭当前窗口后再执行下一条命令。预览不执行轨迹或击球，默认隐藏遮挡机械臂的外部安装架，仅影响显示。
 
 | 预览选项 | 用途 |
 | --- | --- |
@@ -121,9 +122,9 @@ python run_trajectory.py --shape all --headless
 python continuous_hitting.py --nballs 10
 ```
 
-场景包含标准尺寸球台、球网、发球机外观、40 mm 球及末端刚性安装的球拍。默认来球位置为 (1.58, 0, 1.02) m，速度为 (-5, 0, -1) m/s，目标落点为 (0.58, 0) m。来球、球拍和台面的相互作用由 MuJoCo 计算。
+场景包含标准尺寸球台、球网、发球机外观、40 mm 球及末端刚性安装的球拍。默认来球位置为 (1.40, 0, 1.02) m，速度为 (-6.5, 0, -1) m/s，目标落点为 (0.58, 0) m。来球、球拍和台面的相互作用由 MuJoCo 计算。
 
-流程为：碰撞标定 → 第一球完整预测与拍速搜索 → 挥拍、触球及落点判定 → 下一球。第一球前可能等待数十秒，后续球复用第一球拍速并重新计算拦截时刻。终端逐球打印是否接触、落点与误差。
+流程为：每球预测拦截时刻 → 使用固定拍速 (1.10, 0, 0.45) m/s 挥拍 → 触球和落点判定 → 下一球。该拍速仅针对当前固定来球、竖直球拍和 MuJoCo 3.6.0 验证；终端逐球打印是否接触、落点与误差。
 
 **当前连续演示是同一窗口内的逐球实验，每球都会复位整个仿真状态，且关闭来球随机抖动。** 它不是保持多个球同时存在的连续物理世界，不能据此评估真实发球机的固定节拍或随机来球成功率。
 
@@ -147,7 +148,7 @@ Get-Content results\continuous_10_summary.json
 | --- | --- |
 | `requested_balls` | 请求球数 |
 | `simulated_balls` | 返回结果的试验数，可能包含关窗中止的试验 |
-| `contacts` | 检测到球拍面或拍柄接触的试验数 |
+| `contacts` | 检测到球拍面接触的试验数 |
 | `landings` | 击球后满足对方台面落点判定的试验数 |
 | `success_100mm` | 接触后满足过网检查、落台且目标误差小于 100 mm 的试验数 |
 | `mean_landing_error_m` / `max_landing_error_m` | 有落点试验的平均 / 最大误差，不含无落点试验 |
@@ -192,7 +193,7 @@ python run_hitting.py --n 20 --seed 1000
 | 看不到窗口 / IDE 使用了其他环境 | 在终端激活 `mujoco-sim-win`，或在 IDE 选择该环境；可使用第 1 节的 `conda run --no-capture-output` |
 | `conda env create` 提示环境已存在 | 跳过创建步骤并激活同名环境；缺依赖时按第 1 节更新环境 |
 | 找不到脚本或 `environment_win.yml` | 确认当前目录为克隆仓库中的 `delta_sim/` |
-| 第一球迟迟未动 | 首球先做标定、预测与拍速搜索；查看终端。不能仅凭短暂等待判定卡死 |
+| 第一球迟迟未动 | 检查终端异常和 MuJoCo 窗口；固定来球演示不执行首球拍速搜索 |
 | 全部运行结束但终端未退出 | 最终窗口按设计保留；轨迹可用 `--auto-close`，击球需关闭窗口 |
 | 击球 JSON 还是上次结果 | 本轮需关闭窗口后才保存；检查 JSON 的实际球数 |
 | 请求 10 球但实际球数不足 | 核对 `simulated_balls` 与 CSV；不能仅凭文件名认为完整运行，也不能仅凭汇总确定中断原因 |
@@ -201,4 +202,4 @@ python run_hitting.py --n 20 --seed 1000
 | 五角星标签尺寸与图形不一致 | 以实际外半径 50 mm、外接圆直径 100 mm 为准 |
 | 修改球拍 XML 后被覆盖 | `delta_robot_paddle.xml` 自动生成；修改 `make_paddle_robot.py`，基础机械臂修改 `delta_robot.xml` |
 
-实机迁移前尚需处理球拍安装坐标、质量惯量、碰撞与空气参数、驱动器动态等问题，见[工作总结的限制说明](../WORK_SUMMARY.md#6-当前限制与-sim2real-准备)。
+当前竖直拍面模型的固定来球 10 球验证为拍面接触 10/10、落台 10/10、目标成功 10/10，落点误差约 38.5 mm。来球到达拍面时仍处于上升段；此结果不能推广到下落来球、随机来球或实机。实机迁移前仍需测量安装公差、质量惯量、碰撞与空气参数、驱动器动态，见[工作总结的限制说明](../WORK_SUMMARY.md#6-当前限制与-sim2real-准备)。

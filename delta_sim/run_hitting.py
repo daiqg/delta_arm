@@ -2,7 +2,7 @@
 run_hitting.py — Delta 机械臂 + 乒乓球拍 击球仿真 (v3, 预演式求解)
 ====================================================================
 场景: 标准球台 (2.74x1.525x0.76m) + 球网, 发球机在台端外发球,
-      Delta 机械臂吊装在己方台端上方, 拍面前倾30°刚性固定于动平台。
+      Delta 机械臂吊装在己方台端上方, 球拍从动平台中心竖直向下刚性固定。
 
 击球几何 (与真实接攻球一致):
   发球 -> 发球方台面弹跳 -> 过网 -> 接球方台面弹跳 -> 球升至顶点后下落
@@ -41,18 +41,17 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 # ---------------- 场景常量 ----------------
-BASE_POS     = np.array([-0.69, 0.0, 1.18])     # 机器人基座世界位置 (定心于拦截窗口)
-N            = np.array([math.cos(math.radians(30)), 0.0,
-                         math.sin(math.radians(30))])   # 拍面法线 (前倾30°)
+BASE_POS     = np.array([-0.69, 0.0, 1.65])     # 使竖直拍面拦截来球上升段
+N            = np.array(make_paddle_robot.PADDLE_NORMAL)
 T1           = np.array([-N[2], 0.0, N[0]])     # 拍面切向 (竖直面内, 下前方向)
 T2           = np.array([0.0, 1.0, 0.0])        # 拍面切向 (水平横向)
-P_OFF        = np.array([0.045, 0.0, -0.095])   # 拍心相对平台中心 (平台系=基座系)
-FACE_CLEAR   = 0.020 + 0.006 + 0.002            # 球半径+拍半厚+余量
+P_OFF        = np.array(make_paddle_robot.PADDLE_OFFSET)
+FACE_CLEAR   = 0.020 + make_paddle_robot.PADDLE_HALF_THICK + 0.002
 HOME_PLAT    = np.array([-0.055, 0.0, -0.215])  # 待机平台位置 (基座系)
-Z_FLOOR_REL  = -0.235                           # 平台下限 (拍缘不入台面)
+Z_FLOOR_REL  = 0.76 + 0.010 - BASE_POS[2] - make_paddle_robot.PADDLE_BOTTOM_OFFSET
 
-LAUNCH_POS   = np.array([1.58, 0.0, 1.02])      # 发球机出球口
-LAUNCH_V     = np.array([-5.0, 0.0, -1.0])      # 基础发球速度
+LAUNCH_POS   = np.array([1.40, 0.0, 1.02])      # 发球机出球口
+LAUNCH_V     = np.array([-6.5, 0.0, -1.0])      # 固定演示来球速度
 TARGETS      = [(0.45, 0.0), (0.58, 0.18), (0.58, -0.18),
                 (0.32, 0.0), (0.68, 0.0)]       # 目标落点 (对方台面)
 TARGET_R     = 0.10                             # 成功半径 [m]
@@ -132,7 +131,7 @@ class HittingSim:
         self.kv = -self.model.actuator_biasprm[0, 2]
         self.gid_ball = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, "ball_geom")
         self.gid_face = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, "paddle_face")
-        self.gid_handle = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, "paddle_handle")
+        self.sid_paddle = self.model.site('paddle_center').id
         self.bias = np.zeros(2)          # 自适应落点偏差
         self.e, self.lam = 0.60, 0.15    # 碰撞近似模型参数 (粗筛用, 标定后更新)
         self.q_home = kin.ik_safe(HOME_PLAT)
@@ -202,7 +201,7 @@ class HittingSim:
             if τ < t_A_end:
                 return hermite(τ - t_start, T_A, p_home, np.zeros(3), p_A, v_pad)
             if τ < t_B_end:
-                return plat_t + v_pad * (τ - t_A_end), v_pad
+                return plat_t + v_pad * (τ - t_imp_rel), v_pad
             if τ < t_B_end + T_R:
                 return hermite(τ - t_B_end, T_R, p_B, v_pad, p_home, np.zeros(3))
             return p_home, np.zeros(3)
@@ -251,8 +250,7 @@ class HittingSim:
             if not contacted:
                 for c in range(d.ncon):
                     ct = d.contact[c].geom1, d.contact[c].geom2
-                    if (self.gid_ball in ct and
-                            (self.gid_face in ct or self.gid_handle in ct)):
+                    if self.gid_ball in ct and self.gid_face in ct:
                         contacted = True
                         break
             if contacted and v_out is None:
@@ -299,7 +297,8 @@ class HittingSim:
         self.iface.ctrl_set(q)
         for _ in range(500):
             mujoco.mj_step(m, d)
-        blade_c = BASE_POS + p_plat + P_OFF
+        mujoco.mj_fwdPosition(m, d)
+        blade_c = d.site_xpos[self.sid_paddle].copy()
         v_in = -2.5 * N + 1.5 * T2
         set_ball(d, self.qadr, self.vadr, blade_c + N * 0.05, v_in)
         mujoco.mj_forward(m, d)
@@ -474,7 +473,7 @@ class HittingSim:
             if not impact_detected:
                 for c in range(d.ncon):
                     ct = d.contact[c].geom1, d.contact[c].geom2
-                    if self.gid_ball in ct and (self.gid_face in ct or self.gid_handle in ct):
+                    if self.gid_ball in ct and self.gid_face in ct:
                         impact_detected = True
                         log['contact'] = (τ, d.qpos[self.qadr:self.qadr+3].copy())
                         break
@@ -484,7 +483,8 @@ class HittingSim:
             bv = d.qvel[self.vadr:self.vadr+3].copy()
             if record and step % 4 == 0:
                 log['ball'].append((τ, bp.copy()))
-                log['paddle'].append((τ, (BASE_POS + self.iface.ee_pos() + P_OFF).copy()))
+                mujoco.mj_fwdPosition(m, d)
+                log['paddle'].append((τ, d.site_xpos[self.sid_paddle].copy()))
 
             # 过网检查 (击球后)
             if impact_detected:

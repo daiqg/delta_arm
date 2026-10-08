@@ -5,9 +5,8 @@
 无图形环境：
     python continuous_hitting.py --headless
 
-球以固定间隔从发球机抛出。第一球使用完整的碰撞复演求解拍速，后续球
-复用已经标定的拍速并重新计算拦截时刻，因此能够连续运行而不会每球等待
-几十秒的候选搜索。每一球仍然经过 MuJoCo 的真实球-拍面、球-球台碰撞。
+球以固定来球条件逐球发出，使用已验证的固定拍速，并重新预测每球的拦截时刻。
+每一球仍然经过 MuJoCo 的球-拍面、球-球台碰撞；试验之间复位仿真状态。
 """
 from __future__ import annotations
 import argparse
@@ -28,6 +27,10 @@ import matplotlib.pyplot as plt
 from run_hitting import HittingSim
 
 
+# Identified for the fixed, rising-ball demonstration in MuJoCo 3.6.0.
+FIXED_STREAM_VPAD = np.array([1.10, 0.0, 0.45])
+
+
 def run(nballs=10, headless=False, seed=20261007, realtime=True):
     if not headless and mj_viewer is None:
         raise RuntimeError(
@@ -35,10 +38,9 @@ def run(nballs=10, headless=False, seed=20261007, realtime=True):
             'Run with the mujoco-sim-win environment: '
             'conda run -n mujoco-sim-win python continuous_hitting.py')
     sim = HittingSim()
-    sim.calibrate_impact()
     target = np.array([0.58, 0.0])  # central repeatable target on opponent side
     results = []
-    cached_vpad = None
+    fixed_vpad = FIXED_STREAM_VPAD.copy()
     viewer = None
 
     if not headless:
@@ -57,10 +59,8 @@ def run(nballs=10, headless=False, seed=20261007, realtime=True):
                 break
             result = sim.run_trial(
                 seed + i, target, record=True, viewer=viewer,
-                realtime=realtime, v_pad_override=cached_vpad,
+                realtime=realtime, v_pad_override=fixed_vpad,
                 launch_jitter=0.0)
-            if cached_vpad is None and 'v_pad' in result:
-                cached_vpad = result['v_pad']
             results.append(result)
             landing = result.get('landing')
             err = result.get('err')
