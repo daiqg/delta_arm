@@ -1,287 +1,69 @@
-# Delta Robot Simulation Project
+# Delta 机械臂 MuJoCo 仿真项目
 
-A MuJoCo-based simulation platform for Delta robot control, featuring PS2 joystick teleoperation and ball interception tasks.
+本项目提供 Delta 机械臂的末端轨迹绘制，以及末端刚性安装乒乓球拍的击球仿真，均使用 MuJoCo。机械臂采用参考 CAD 装配网格。本仓库已用独立新版替换旧项目，运行不依赖 `Project_uav/`；所需 STL 已包含在 `delta_sim/meshes/` 中。
 
-## Features
+- [详细使用指南](delta_sim/README.md)：环境、命令、可视化、输出与排错。
+- [本次工作总结](WORK_SUMMARY.md)：仿真结构、参数、验证结果、问题与解决方案、sim2real 限制。
 
-- **Delta Robot Simulation**: Independent simulation with base mounted at 4.0m height
-- **PS2 Joystick Control**: Real-time teleoperation using 2.4G wireless gamepad
-- **Ball Interception**: Predictive trajectory planning and catching system
-- **Workspace Analysis**: Automated workspace computation and visualization
+## 1. 进入运行环境
 
----
+先克隆仓库：
 
-## Project Structure
-
-```
-uav_project/
-├── config.py                      # Global configuration parameters
-├── config_workspace.py            # Workspace bounds and base height
-├── compute_workspace.py           # Workspace analysis tool
-│
-├── main_delta.py                  # Delta trajectory simulation entry
-├── main_delta_joystick.py         # PS2 joystick control entry
-├── main_delta_intercept_optimized.py  # Ball interception entry
-│
-├── hardware/
-│   ├── __init__.py
-│   └── ps2_controller.py          # PS2 joystick driver
-│
-├── controllers/
-│   ├── delta_arm_controller.py    # Delta base controller
-│   ├── delta_intercept_controller_optimized.py  # Interception controller
-│   └── pid.py                     # PID implementations
-│
-├── models/
-│   ├── delta_model.py             # Delta sensor/actuator interface
-│   └── delta_ball_model.py        # Ball model extension
-│
-├── utils/
-│   ├── DeltaKinematics.py         # Forward/Inverse kinematics
-│   ├── ball_predictor.py          # 3-point trajectory fitting
-│   ├── ball_trajectory_generator.py   # Collision-free trajectory
-│   ├── smooth_trajectory.py       # C4-continuous trajectory planning
-│   └── logger.py                  # Data recording and visualization
-│
-└── meshes/
-    ├── Delta_Arm.xml              # Delta robot model
-    └── Delta_Ball.xml             # Delta + Ball model
+```powershell
+git clone https://github.com/daiqg/delta_arm.git
+cd delta_arm
 ```
 
----
+在 PowerShell 或 Anaconda Prompt 中激活环境，再进入模块目录：
 
-## Installation
-
-### Prerequisites
-
-- Python 3.11
-- Conda (recommended)
-
-### Environment Setup
-
-```bash
-# Create conda environment
-conda env create -f environment_win.yml
-
-# Activate environment
+```powershell
 conda activate mujoco-sim-win
-
-# Verify installation
-python -c "import mujoco; print(f'MuJoCo: {mujoco.__version__}')"
-python -c "import torch; print(f'PyTorch: {torch.__version__}')"
+cd delta_sim
+python -c "import sys, mujoco, mujoco.viewer; print(sys.executable); print(mujoco.__version__)"
 ```
 
----
+已有的 `mujoco-sim-win` 环境已验证 MuJoCo 3.6.0。其他电脑可先创建环境：
 
-## Usage
-
-### 1. PS2 Joystick Teleoperation
-
-Control the Delta robot using a PS2 2.4G wireless gamepad.
-
-**Hardware Requirements:**
-- PS2 2.4G wireless gamepad with USB receiver
-- System detects as "USB WirelessGamepad" (HID device)
-
-**Running:**
-```bash
-cd Project_uav
-python -m uav_project.main_delta_joystick
+```powershell
+conda create -n mujoco-sim-win python=3.11 -y
+conda activate mujoco-sim-win
+python -m pip install -r requirements.txt
+python -m pip install mujoco==3.6.0
 ```
 
-**Controls:**
-| Button/Axis | Function |
-|-------------|----------|
-| Left Stick X/Y | End-effector X/Y position |
-| Left Stick Up/Down | End-effector Z position (hold L2) |
-| L2 + Left Stick | Z-axis control |
-| R2 | Reset to home position |
+已有环境缺少依赖时执行：
 
-**Files:**
-- `hardware/ps2_controller.py`: Joystick driver implementation
-- `main_delta_joystick.py`: Main entry point
-
-### 2. Ball Interception Task
-
-The Delta robot intercepts and catches flying balls.
-
-**Running:**
-```bash
-cd Project_uav
-python -m uav_project.main_delta_intercept_optimized
+```powershell
+python -m pip install -r requirements.txt
 ```
 
-**Key Features:**
-- **3-Point Trajectory Fitting**: Uses 2 points for fitting, 1 for validation
-- **Virtual Paddle Model**: 7.5cm radius paddle centered 10cm above platform
-- **Collision Avoidance**: Trajectories avoid Delta base and arm links
-- **C4-Continuous Motion**: Smooth trajectory with continuous derivatives
+VS Code / PyCharm 也应选择 `mujoco-sim-win` 的 Python 解释器。
 
-**Configuration:**
-- Base height: 4.0m (configurable in `config_workspace.py`)
-- Workspace bounds: Auto-computed from kinematics
-- Catch threshold: 9.5cm (paddle radius + ball radius)
+## 2. 常用命令
 
-**Files:**
-- `main_delta_intercept_optimized.py`: Main entry point
-- `controllers/delta_intercept_controller_optimized.py`: Interception logic
-- `utils/ball_predictor.py`: Trajectory prediction
-- `utils/ball_trajectory_generator.py`: Trajectory generation
+以下命令均在 `delta_sim/` 目录中运行：
 
-### 3. Trajectory Simulation
+| 目的 | 命令 | 行为 |
+| --- | --- | --- |
+| 查看 CAD 机械臂 | `python preview_model.py` | 保存近景截图并打开静态窗口 |
+| 查看机械臂与球拍 | `python preview_model.py --paddle` | 显示末端刚性安装的球拍 |
+| 绘制全部五种轨迹 | `python run_trajectory.py --shape all` | 默认打开 MuJoCo 窗口，每种轨迹执行两周期 |
+| 绘制两圈螺旋线 | `python run_trajectory.py --shape helix --cycles 2` | 半径 40 mm，总 Z 行程 40 mm |
+| 连续演示 10 球 | `python continuous_hitting.py --nballs 10` | 默认打开窗口，第一球需要求解拍速 |
+| 检查模型与运动学 | `python verify_kinematics.py` | 检查 CAD 类型、FK/IK、闭环、重力保持及工作空间 |
 
-Run Delta robot along predefined trajectories.
+轨迹窗口中，蓝色虚线是期望路径，橙色实线是已走过的实际路径。轨迹全部完成后默认保留画面，关闭窗口即可退出；添加 `--auto-close` 可自动退出。
 
-```bash
-cd Project_uav
-python -m uav_project.main_delta
+击球窗口在最后一球后也保留画面。**关闭击球窗口后才保存本轮 CSV、汇总 JSON 和最终截图**；提前关闭会得到不完整的球数记录。第一球的标定与搜索可能耗时数十秒。
+
+## 3. 无窗口运行
+
+```powershell
+python run_trajectory.py --shape all --headless
+python continuous_hitting.py --nballs 10 --headless --no-realtime
+python run_hitting.py --n 1 --seed 1000
 ```
 
----
+`--headless` 表示不打开窗口，截图仍可能需要 OpenGL。结果写入 `delta_sim/results/`，再次运行会覆盖同名文件。击球结果应检查 `simulated_balls`、`contacts`、`landings` 和 `success_100mm`，不能只看文件名。
 
-## Configuration
-
-### Workspace Bounds (`config_workspace.py`)
-
-```python
-# Base height in world frame
-BASE_HEIGHT = 4.0  # meters
-
-# Workspace bounds (relative to base)
-WORKSPACE_BOUNDS = {
-    'x': (-0.07, 0.07),   # ±7cm
-    'y': (-0.08, 0.05),   # -8cm to +5cm
-    'z': (-0.19, -0.09)   # Below base
-}
-
-# Effective XY radius
-WORKSPACE_RADIUS = 0.055  # meters
-```
-
-### Coordinate System
-
-```
-World Frame:          Local Frame (relative to base):
-      Z ↑                    Z ↑
-        |                      |
-        |______→ Y             |______→ Y
-       /                      /
-      /                      /
-     ↙ X                    ↙ X
-
-Base at z = 4.0m          Base at z = 0.0m
-```
-
-**Conversion:**
-```python
-# World → Local
-local_z = world_z - BASE_HEIGHT
-
-# Local → World
-world_z = local_z + BASE_HEIGHT
-```
-
----
-
-## Key Algorithms
-
-### 1. Delta Kinematics
-
-- **Forward Kinematics**: Joint angles → End-effector position
-- **Inverse Kinematics**: End-effector position → Joint angles
-- Implemented in `utils/DeltaKinematics.py`
-
-### 2. 3-Point Trajectory Fitting
-
-Physics model: `r(t) = r₀ + v₀·t + 0.5·g·t²`
-
-- Collect 3 position samples from ball trajectory
-- Use 2 points to solve for initial position and velocity
-- Use 3rd point for validation (threshold: 10cm)
-
-### 3. Virtual Paddle Catch Model
-
-```
-        ┌─────────────┐
-        │   Paddle    │  ← 7.5cm radius
-        │  (virtual)  │
-        └──────┬──────┘
-               │
-          10cm │ sensor offset
-               │
-        ┌──────┴──────┐
-        │  Platform   │  ← Physical platform
-        └─────────────┘
-```
-
-**Catch Condition:** `distance(ball_center, paddle_center) < 9.5cm`
-
----
-
-## Dependencies
-
-| Package | Version | Purpose |
-|---------|---------|---------|
-| mujoco | ≥3.0.0 | Physics simulation |
-| torch | 2.3.1 | Controller computation |
-| numpy | <2.0 | MuJoCo data interface |
-| scipy | - | Rotation/quaternion |
-| matplotlib | - | Visualization |
-| pygame | ≥2.5.0 | Joystick input |
-
----
-
-## Results
-
-### Simulation Screenshots
-
-Located in `uav_project/`:
-- `delta_workspace_3d.png`: 3D workspace visualization
-- `joystick_simulation_results.png`: Joystick control results
-- `optimized_interception_results.png`: Interception task results
-
-### Example Outcomes
-
-- `optimized_caught_example.png`: Successful catch
-- `optimized_missed_example.png`: Missed catch
-
----
-
-## Known Issues
-
-1. **Coordinate System Inconsistency**: The ball interception system currently has low catch rate due to mixed use of world and local coordinates. This is being addressed.
-
-2. **Trajectory Re-planning**: Temporarily disabled to avoid timing issues.
-
----
-
-## Development
-
-### Adding New Controllers
-
-1. Create controller in `controllers/`
-2. Inherit from `DeltaArmController`
-3. Implement required methods:
-   - `update(sim_time)`
-   - `get_log_data()`
-   - `set_target_position(pos)`
-
-### Data Type Convention
-
-```
-MuJoCo API ←→ NumPy (float64)
-     ↕
-Controller  ←→ PyTorch Tensor (float32)
-```
-
----
-
-## License
-
-MIT License
-
----
-
-## Author
-
-Delta Robot Simulation Project Team
+当前连续演示采用固定来球、逐球复位，是可重复的仿真流程验证。随机来球与实机准确率，以及材料、驱动器和坐标变换的标定要求，见[工作总结](WORK_SUMMARY.md)。

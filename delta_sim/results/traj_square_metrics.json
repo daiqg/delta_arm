@@ -1,0 +1,15 @@
+{
+  "shape": "square",
+  "name": "正方形 边长80mm",
+  "mean": 4.911938853930826e-05,
+  "rms": 5.231132576961998e-05,
+  "mx": 8.644053937756772e-05,
+  "z_max_m": 4.4744867596563376e-05,
+  "z_peak_to_peak_m": 3.669538426120944e-05,
+  "z_error_step_max_m": 1.2377571373400897e-07,
+  "closure_max_m": 5.5161899314350225e-05,
+  "actuator_peak_nm": 0.21501151426946308,
+  "samples": 6001,
+  "sample_period_s": 0.001,
+  "completed": true
+}

@@ -1,0 +1,15 @@
+{
+  "shape": "figure8",
+  "name": "8字形 90x45mm",
+  "mean": 3.999465178609523e-05,
+  "rms": 4.252918860711434e-05,
+  "mx": 8.620815310439907e-05,
+  "z_max_m": 4.799391781143414e-05,
+  "z_peak_to_peak_m": 3.888579249988755e-05,
+  "z_error_step_max_m": 1.794434241197962e-07,
+  "closure_max_m": 8.68971670158904e-05,
+  "actuator_peak_nm": 0.24997846071914864,
+  "samples": 6001,
+  "sample_period_s": 0.001,
+  "completed": true
+}

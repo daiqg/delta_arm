@@ -1,17 +1,10 @@
-# 统一所有文本文件使用LF换行符
-* text=auto eol=lf
-
-# 指定特定文件类型
+* text=auto
 *.py text eol=lf
-*.txt text eol=lf
-*.yaml text eol=lf
 *.xml text eol=lf
-*.launch text eol=lf
-*.urdf text eol=lf
-
-# 二进制文件不需要转换
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.csv text eol=lf
+*.STL binary
+*.stl binary
 *.png binary
-*.jpg binary
-*.gif binary
-*.h5 binary
-*.pth binary

@@ -1,47 +1,10 @@
-# macOS系统文件
-.DS_Store
-.AppleDouble
-.LSOverride
-
-.trae/ 
-
-# Python相关
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
 .venv/
-ENV/
-
-# MuJoCo缓存
+venv/
 .mujoco/
-
-# IDE文件
+MUJOCO_LOG.TXT
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# 大文件和数据
-*.h5
-*.pth
-*.pkl
-*.pt
-*.bin
-data/
-logs/
-
-# Simulation outputs and Log files
-MUJOCO_LOG.TXT
-simulation_results.png
-
-# Excluded folders (not used in project)
-Backup/
-deepseek_code/
-uav_control/
-
-# Test files (debugging only)
-test_*.py
+.DS_Store
+*.log

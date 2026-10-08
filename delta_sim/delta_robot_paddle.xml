@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  delta_robot.xml — CAD Delta 机械臂 MuJoCo 模型（共享定义, 被 scene_*.xml include）
+
+  几何参数 (与 CAD STL 一致, 单位: 米):
+    基座铰接(肩)半径 R_B   = 0.0745
+    上臂长 L_U             = 0.100  (肩轴 -> 肘球铰, 沿上臂径向)
+    前臂(连杆)长 L_F       = 0.200  (肘球铰 -> 动平台球铰)
+    动平台铰接半径 R_E     = 0.02494 (三铰接点外接圆半径, 中心 = 末端中心)
+    三个肩按 0°/120°/240° 分布:
+      joint1 (motor_arm_joint1) -> 肩角 240° (mount euler z=-120°)
+      joint2 (motor_arm_joint2) -> 肩角 120° (mount euler z=+120°)
+      joint3 (motor_arm_joint3) -> 肩角   0°
+    关节角 q: 0° = 上臂水平指向外侧, 负值 = 上臂向下 (物理范围约 [-70°, -10°])
+    Delta 并联闭环: 每臂两根前臂经 equality/connect 收敛到动平台, 动平台始终保持与基座平行
+
+  质量 (CAD 估重): 上臂组件 53g×3, 前臂杆 25g×6, 动平台 56g
+-->
+<mujoco model="delta_robot_paddle">
+  <!-- CAD meshes use explicit types: a mesh attribute alone defaults to a sphere.
+       Mesh-derived inertia uses the assigned component masses (SI units).
+       Constraint/sensor sites remain active but are invisible in normal rendering. -->
+  <asset>
+    <mesh name="delta_base_board_1" file="delta_base_board_1.STL" scale="1 1 1" />
+    <mesh name="delta_base_board_2" file="delta_base_board_2.STL" scale="1 1 1" />
+    <mesh name="delta_base_motor_1" file="delta_base_motor_1.STL" scale="1 1 1" />
+    <mesh name="delta_base_motor_2" file="delta_base_motor_2.STL" scale="1 1 1" />
+    <mesh name="delta_base_motor_3" file="delta_base_motor_3.STL" scale="1 1 1" />
+    <!-- arm 3 (肩角 0°) -->
+    <mesh name="elbow3_connector" file="delta_elbow_3_connector_1.STL" scale="1 1 1" />
+    <mesh name="elbow3_frame"     file="delta_elbow_3_frame_base_1.STL" scale="1 1 1" />
+    <mesh name="elbow3_upper"     file="delta_elbow_3_upper_arm_1.STL" scale="1 1 1" />
+    <mesh name="elbow3_ball1"     file="delta_elbow_3_balljoint_1.STL" scale="1 1 1" />
+    <mesh name="elbow3_ball2"     file="delta_elbow_3_balljoint_2.STL" scale="1 1 1" />
+    <mesh name="elbow3_motorframe" file="delta_elbow_3_motor_frame_1.STL" scale="1 1 1" />
+    <!-- arm 2 (肩角 +120°) -->
+    <mesh name="elbow2_connector" file="delta_elbow_2_connector_1.STL" scale="1 1 1" />
+    <mesh name="elbow2_frame"     file="delta_elbow_2_frame_base_1.STL" scale="1 1 1" />
+    <mesh name="elbow2_upper"     file="delta_elbow_2_upper_arm_1.STL" scale="1 1 1" />
+    <mesh name="elbow2_ball1"     file="delta_elbow_2_balljoint_1.STL" scale="1 1 1" />
+    <mesh name="elbow2_ball2"     file="delta_elbow_2_balljoint_2.STL" scale="1 1 1" />
+    <mesh name="elbow2_motorframe" file="delta_elbow_2_motor_frame_1.STL" scale="1 1 1" />
+    <!-- arm 1 (肩角 -120°) -->
+    <mesh name="elbow1_connector" file="delta_elbow_1_connector_1.STL" scale="1 1 1" />
+    <mesh name="elbow1_frame"     file="delta_elbow_1_frame_base_1.STL" scale="1 1 1" />
+    <mesh name="elbow1_upper"     file="delta_elbow_1_upper_arm_1.STL" scale="1 1 1" />
+    <mesh name="elbow1_ball1"     file="delta_elbow_1_balljoint_1.STL" scale="1 1 1" />
+    <mesh name="elbow1_ball2"     file="delta_elbow_1_balljoint_2.STL" scale="1 1 1" />
+    <mesh name="elbow1_motorframe" file="delta_elbow_1_motor_frame_1.STL" scale="1 1 1" />
+    <!-- 动平台 -->
+    <mesh name="end_platform"  file="delta_end_1.STL" scale="1 1 1" />
+    <mesh name="end_ball1"     file="delta_end_balljoint_1.STL" scale="1 1 1" />
+    <mesh name="end_ball2"     file="delta_end_balljoint_2.STL" scale="1 1 1" />
+    <mesh name="end_ball3"     file="delta_end_balljoint_3.STL" scale="1 1 1" />
+    <mesh name="end_ball4"     file="delta_end_balljoint_4.STL" scale="1 1 1" />
+    <mesh name="end_ball5"     file="delta_end_balljoint_5.STL" scale="1 1 1" />
+    <mesh name="end_ball6"     file="delta_end_balljoint_6.STL" scale="1 1 1" />
+    <!-- 前臂杆 -->
+    <mesh name="lower_arm_1" file="delta_lower_arm_1.STL" scale="1 1 1" />
+    <mesh name="lower_arm_2" file="delta_lower_arm_2.STL" scale="1 1 1" />
+    <mesh name="lower_arm_4" file="delta_lower_arm_4.STL" scale="1 1 1" />
+    <mesh name="lower_arm_5" file="delta_lower_arm_5.STL" scale="1 1 1" />
+    <mesh name="lower_arm_6" file="delta_lower_arm_6.STL" scale="1 1 1" />
+
+    <texture name="tex_grid" type="2d" builtin="checker" rgb1=".15 .2 .27" rgb2=".25 .32 .4" width="100" height="100" />
+    <material name="mat_grid" texture="tex_grid" texrepeat="8 8" reflectance="0.0" />
+    <material name="mat_base"  rgba="0.68 0.70 0.74 1" specular="0.25" shininess="0.15" />
+    <material name="mat_elbow" rgba="0.45 0.58 0.82 1" specular="0.20" shininess="0.10" />
+    <material name="mat_plat"  rgba="0.95 0.55 0.18 1" specular="0.25" shininess="0.12" />
+    <material name="mat_link"  rgba="0.18 0.82 0.32 1" specular="0.20" shininess="0.10" />
+  </asset>
+
+  <worldbody>
+    <body name="delta_base" pos="0 0 0">
+      <site name="base_center" pos="0 0 0" size="0.004" group="3" rgba="0 0 0 0" />
+      <!-- 基座(固定): 两块安装板 + 三个电机座 -->
+      <geom type="mesh" name="base_board_1" mesh="delta_base_board_1" material="mat_base" mass="0.040" contype="0" conaffinity="0" />
+      <geom type="mesh" name="base_board_2" mesh="delta_base_board_2" material="mat_base" mass="0.040" contype="0" conaffinity="0" />
+      <geom type="mesh" name="base_motor_1" mesh="delta_base_motor_1" material="mat_base" mass="0.035" contype="0" conaffinity="0" />
+      <geom type="mesh" name="base_motor_2" mesh="delta_base_motor_2" material="mat_base" mass="0.035" contype="0" conaffinity="0" />
+      <geom type="mesh" name="base_motor_3" mesh="delta_base_motor_3" material="mat_base" mass="0.035" contype="0" conaffinity="0" />
+
+      <!-- ===== arm 2: 肩角 +120° ===== -->
+      <body name="elbow2_mount" euler="0 0 2.0943951023931953">
+        <body name="elbow2" pos="0.0745 0 0">
+          <joint name="motor_arm_joint2" type="hinge" pos="0 0 0" axis="0 -1 0"
+                 damping="0.05" limited="true" range="-1.22173 -0.17453" ref="0" />
+          <geom type="mesh" mesh="elbow2_connector"  material="mat_elbow" mass="0.008" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow2_frame"      material="mat_elbow" mass="0.010" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow2_upper"      material="mat_elbow" mass="0.020" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow2_ball1"      material="mat_elbow" mass="0.003" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow2_ball2"      material="mat_elbow" mass="0.003" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow2_motorframe" material="mat_elbow" mass="0.009" contype="0" conaffinity="0" />
+          <body name="forearm2a" pos="0.1 -0.0262 0">
+            <joint name="forearm2a_ball" type="ball" pos="0 0 0" damping="0.01" />
+            <geom type="mesh" mesh="lower_arm_4" material="mat_link" mass="0.025" contype="0" conaffinity="0" />
+            <site name="forearm2a_tip" pos="-0.1495 0 -0.1328" size="0.003" group="3" rgba="0 0 0 0" />
+          </body>
+          <body name="forearm2b" pos="0.1 0.0262 0">
+            <joint name="forearm2b_ball" type="ball" pos="0 0 0" damping="0.01" />
+            <geom type="mesh" mesh="lower_arm_5" material="mat_link" mass="0.025" contype="0" conaffinity="0" />
+            <site name="forearm2b_tip" pos="-0.1495 0 -0.1328" size="0.003" group="3" rgba="0 0 0 0" />
+          </body>
+        </body>
+      </body>
+
+      <!-- ===== arm 1: 肩角 -120° ===== -->
+      <body name="elbow1_mount" euler="0 0 -2.0943951023931953">
+        <body name="elbow1" pos="0.0745 0 0">
+          <joint name="motor_arm_joint1" type="hinge" pos="0 0 0" axis="0 -1 0"
+                 damping="0.05" limited="true" range="-1.22173 -0.17453" ref="0" />
+          <geom type="mesh" mesh="elbow1_connector"  material="mat_elbow" mass="0.008" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow1_frame"      material="mat_elbow" mass="0.010" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow1_upper"      material="mat_elbow" mass="0.020" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow1_ball1"      material="mat_elbow" mass="0.003" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow1_ball2"      material="mat_elbow" mass="0.003" contype="0" conaffinity="0" />
+          <geom type="mesh" mesh="elbow1_motorframe" material="mat_elbow" mass="0.009" contype="0" conaffinity="0" />
+          <body name="forearm1a" pos="0.1 -0.0262 0">
+            <joint name="forearm1a_ball" type="ball" pos="0 0 0" damping="0.01" />
+            <geom type="mesh" mesh="lower_arm_2" material="mat_link" mass="0.025" contype="0" conaffinity="0" />
+            <site name="forearm1a_tip" pos="-0.1495 0 -0.1328" size="0.003" group="3" rgba="0 0 0 0" />
+          </body>
+          <body name="forearm1b" pos="0.1 0.0262 0">
+            <joint name="forearm1b_ball" type="ball" pos="0 0 0" damping="0.01" />
+            <geom type="mesh" mesh="lower_arm_1" material="mat_link" mass="0.025" contype="0" conaffinity="0" />
+            <site name="forearm1b_tip" pos="-0.1495 0 -0.1328" size="0.003" group="3" rgba="0 0 0 0" />
+          </body>
+        </body>
+      </body>
+
+      <!-- ===== arm 3: 肩角 0° (动平台挂在该臂前臂6下端) ===== -->
+      <body name="elbow3" pos="0.0745 0 0">
+        <joint name="motor_arm_joint3" type="hinge" pos="0 0 0" axis="0 -1 0"
+               damping="0.05" limited="true" range="-1.22173 -0.17453" ref="0" />
+        <geom type="mesh" mesh="elbow3_connector"  material="mat_elbow" mass="0.008" contype="0" conaffinity="0" />
+        <geom type="mesh" mesh="elbow3_frame"      material="mat_elbow" mass="0.010" contype="0" conaffinity="0" />
+        <geom type="mesh" mesh="elbow3_upper"      material="mat_elbow" mass="0.020" contype="0" conaffinity="0" />
+        <geom type="mesh" mesh="elbow3_ball1"      material="mat_elbow" mass="0.003" contype="0" conaffinity="0" />
+        <geom type="mesh" mesh="elbow3_ball2"      material="mat_elbow" mass="0.003" contype="0" conaffinity="0" />
+        <geom type="mesh" mesh="elbow3_motorframe" material="mat_elbow" mass="0.009" contype="0" conaffinity="0" />
+        <body name="forearm3a" pos="0.1 -0.0262 0">
+          <joint name="forearm3a_ball" type="ball" pos="0 0 0" damping="0.01" />
+          <geom type="mesh" mesh="lower_arm_6" material="mat_link" mass="0.025" contype="0" conaffinity="0" />
+          <!-- 动平台: 无关节直接子体? 不 — 平台经球铰挂在前臂6末端, 再由其余5根前臂的 connect 约束闭链 -->
+          <body name="end_platform" pos="-0.1495 0 -0.1328">
+            <joint name="end_platform_ball" type="ball" pos="0 0 0" damping="0.01" />
+            <!-- 末端中心 = 动平台三铰接点外接圆圆心 (CAD 实测: 三点构成等边三角形, 边长43.2mm) -->
+            <site name="ee_center" pos="-0.02497 0.0262 0" size="0.005" group="3" rgba="0 0 0 0" />
+            <geom type="mesh" mesh="end_platform" material="mat_plat" mass="0.038" contype="0" conaffinity="0" />
+            <geom type="mesh" mesh="end_ball1" material="mat_plat" mass="0.003" contype="0" conaffinity="0" />
+            <geom type="mesh" mesh="end_ball2" material="mat_plat" mass="0.003" contype="0" conaffinity="0" />
+            <geom type="mesh" mesh="end_ball3" material="mat_plat" mass="0.003" contype="0" conaffinity="0" />
+            <geom type="mesh" mesh="end_ball4" material="mat_plat" mass="0.003" contype="0" conaffinity="0" />
+            <geom type="mesh" mesh="end_ball5" material="mat_plat" mass="0.003" contype="0" conaffinity="0" />
+            <geom type="mesh" mesh="end_ball6" material="mat_plat" mass="0.003" contype="0" conaffinity="0" />
+            <!-- 动平台上的 5 个球铰接点 (与对应前臂 tip 的 connect 约束配对) -->
+            <site name="plat_joint_3b"  pos="0 0.0524 0"        size="0.003" group="3" rgba="0 0 0 0" />
+            <site name="plat_joint_2a"  pos="-0.0148 0.0609 0"  size="0.003" group="3" rgba="0 0 0 0" />
+            <site name="plat_joint_2b"  pos="-0.0601 0.0347 0"  size="0.003" group="3" rgba="0 0 0 0" />
+            <site name="plat_joint_1a"  pos="-0.0601 0.0177 0"  size="0.003" group="3" rgba="0 0 0 0" />
+            <site name="plat_joint_1b"  pos="-0.0148 -0.0085 0" size="0.003" group="3" rgba="0 0 0 0" />
+
+      <!-- ===== 乒乓球拍: 刚性固定于动平台 (无关节, 同一刚体) ===== -->
+      <!-- euler-y = 60° (自垂直起), 拍面法线 = (sin60, 0, cos60) = (cos30, 0, sin30) -->
+      <body name="paddle" pos="0.045 0 -0.095" euler="0 1.0471975511965976 0">
+        <!-- body 系: z = 拍面法线 (前倾30°), x = 拍长轴 (斜向下前方), y = 拍宽 -->
+        <!-- 碰撞体 = 完整拍面含胶皮 (厚12mm, 摩擦=反胶) -->
+        <geom name="paddle_face" type="ellipsoid" size="0.0835 0.0735 0.006" mass="0.075"
+              rgba="0 0 0 0" contype="1" conaffinity="1" condim="3"
+              friction="1.8 0.02 0.005" solref="0.0015 0.07" solimp="0.95 0.99 0.0001 0.5 2"
+              margin="0.001" />
+        <!-- 视觉: 木拍板 -->
+        <geom name="paddle_blade_vis" type="ellipsoid" size="0.085 0.075 0.0035" mass="0.0"
+              rgba="0.62 0.42 0.20 1" contype="0" conaffinity="0" />
+        <!-- 视觉: 正手红胶皮 / 反手黑胶皮 -->
+        <geom name="paddle_rubber_red" type="ellipsoid" size="0.082 0.072 0.0015" pos="0 0 0.0045"
+              mass="0.016" rgba="0.80 0.09 0.09 1" contype="0" conaffinity="0" />
+        <geom name="paddle_rubber_black" type="ellipsoid" size="0.082 0.072 0.0015" pos="0 0 -0.0045"
+              mass="0.016" rgba="0.10 0.10 0.12 1" contype="0" conaffinity="0" />
+        <!-- 拍柄: 90x28x10mm, 沿 -x (上后方) 伸向平台 -->
+        <geom name="paddle_handle" type="box" size="0.045 0.014 0.005" pos="-0.0875 0 0" mass="0.040"
+              rgba="0.55 0.38 0.18 1" contype="1" conaffinity="1" condim="3"
+              friction="0.9 0.02 0.005" solref="0.002 0.1" />
+        <!-- 柄-平台锁紧夹具 -->
+        <geom name="paddle_clamp" type="box" size="0.020 0.024 0.016" pos="-0.055 0 0" mass="0.020"
+              rgba="0.30 0.31 0.35 1" contype="0" conaffinity="0" />
+        <site name="paddle_center" pos="0 0 0" size="0.004" rgba="1 0.5 0 1" />
+      </body>
+
+          </body>
+        </body>
+        <body name="forearm3b" pos="0.1 0.0262 0">
+          <joint name="forearm3b_ball" type="ball" pos="0 0 0" damping="0.01" />
+          <geom type="mesh" mesh="lower_arm_5" material="mat_link" mass="0.025" contype="0" conaffinity="0" />
+          <site name="forearm3b_tip" pos="-0.1495 0 -0.1328" size="0.003" group="3" rgba="0 0 0 0" />
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- Delta 闭环: 5 个 connect 约束 + 前臂6-parent球铰 = 6 根前臂全部闭合 -->
+  <equality>
+    <connect name="cn_forearm3b" site1="forearm3b_tip" site2="plat_joint_3b"  solref="0.002 1" solimp="0.99 0.999 0.0001" />
+    <connect name="cn_forearm2a" site1="forearm2a_tip" site2="plat_joint_2a"  solref="0.002 1" solimp="0.99 0.999 0.0001" />
+    <connect name="cn_forearm2b" site1="forearm2b_tip" site2="plat_joint_2b"  solref="0.002 1" solimp="0.99 0.999 0.0001" />
+    <connect name="cn_forearm1a" site1="forearm1a_tip" site2="plat_joint_1a"  solref="0.002 1" solimp="0.99 0.999 0.0001" />
+    <connect name="cn_forearm1b" site1="forearm1b_tip" site2="plat_joint_1b"  solref="0.002 1" solimp="0.99 0.999 0.0001" />
+  </equality>
+
+  <!-- 三路关节位置伺服 (力矩限幅 6 N·m, 模拟中小型无刷电机+减速器) -->
+  <actuator>
+    <position name="motor1" joint="motor_arm_joint1" kp="3000" kv="45"
+              ctrllimited="true" ctrlrange="-1.22173 -0.17453"
+              forcelimited="true" forcerange="-6 6" />
+    <position name="motor2" joint="motor_arm_joint2" kp="3000" kv="45"
+              ctrllimited="true" ctrlrange="-1.22173 -0.17453"
+              forcelimited="true" forcerange="-6 6" />
+    <position name="motor3" joint="motor_arm_joint3" kp="3000" kv="45"
+              ctrllimited="true" ctrlrange="-1.22173 -0.17453"
+              forcelimited="true" forcerange="-6 6" />
+  </actuator>
+
+  <sensor>
+    <!-- 末端中心位置/速度 (基座坐标系) -->
+    <framepos    name="ee_pos"     objtype="site" objname="ee_center" reftype="site" refname="base_center" />
+    <framelinvel name="ee_lin_vel" objtype="site" objname="ee_center" reftype="site" refname="base_center" />
+    <jointpos    name="q1" joint="motor_arm_joint1" />
+    <jointpos    name="q2" joint="motor_arm_joint2" />
+    <jointpos    name="q3" joint="motor_arm_joint3" />
+  </sensor>
+</mujoco>

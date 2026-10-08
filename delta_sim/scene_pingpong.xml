@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- scene_pingpong.xml — Delta 机械臂 + 乒乓球拍 击球仿真场景
+     机器人(含球拍)经 <include> 引入 delta_robot_paddle.xml (由 delta_robot.xml 自动生成);
+     基座世界安装位置由 Python 设置 (默认 -0.75 0 1.20)。
+
+世界坐标 = 标准乒乓球台坐标 (单位: 米):
+  台面: 2.74 x 1.525, 顶面 z = 0.76, 台面中心 (0,0)
+  球网: x = 0, 高 0.1525 (顶 0.9125), 宽 1.83
+  发球机: 台端外 (1.60, 0, 1.02), 平射发球
+  球:   40mm / 2.7g, 流体阻力 (空气 density 1.2, viscosity 1.8e-5)
+-->
+<mujoco model="delta_pingpong">
+  <compiler angle="radian" coordinate="local" inertiafromgeom="auto" meshdir="meshes" />
+  <option timestep="0.0005" gravity="0 0 -9.81" integrator="implicitfast"
+          density="0.42" viscosity="1.8e-5"
+          iterations="100" ls_iterations="50" />
+
+  <visual>
+    <global offwidth="1920" offheight="1080" />
+  </visual>
+
+  <asset>
+    <texture name="tex_floor" type="2d" builtin="checker" rgb1=".12 .13 .15" rgb2=".18 .19 .22" width="100" height="100" />
+    <material name="mat_floor" texture="tex_floor" texrepeat="14 14" reflectance="0.0" />
+    <material name="mat_table_blue" rgba="0.05 0.28 0.62 1" specular="0.4" shininess="0.3" />
+    <material name="mat_table_dark" rgba="0.10 0.11 0.13 1" />
+    <material name="mat_net" rgba="0.92 0.92 0.95 0.5" />
+    <material name="mat_launcher" rgba="0.25 0.26 0.30 1" specular="0.3" />
+  </asset>
+
+  <worldbody>
+    <light pos="0.6 0.6 3.0" dir="-0.2 -0.2 -1" diffuse="0.95 0.95 0.95" />
+    <light pos="-0.8 -0.5 2.4" dir="0.25 0.15 -1" diffuse="0.45 0.45 0.5" />
+
+    <!-- 地板 -->
+    <geom name="floor" type="plane" size="3 2.5 0.05" material="mat_floor" />
+
+    <!-- ===== 标准球台 (2.74 x 1.525 x 0.76) ===== -->
+    <geom name="table_top" type="box" pos="0 0 0.74" size="1.37 0.7625 0.02"
+          material="mat_table_blue" contype="1" conaffinity="1" condim="3"
+          friction="0.35 0.005 0.0001" solref="0.004 0.05" solimp="0.9 0.95 0.001" margin="0.001" />
+    <geom name="table_skirt" type="box" pos="0 0 0.715" size="1.35 0.7425 0.008"
+          material="mat_table_dark" contype="0" conaffinity="0" />
+    <geom name="table_leg1" type="box" pos="-1.22 0.62 0.37"  size="0.04 0.04 0.37" material="mat_table_dark" contype="0" conaffinity="0" />
+    <geom name="table_leg2" type="box" pos="-1.22 -0.62 0.37" size="0.04 0.04 0.37" material="mat_table_dark" contype="0" conaffinity="0" />
+    <geom name="table_leg3" type="box" pos="1.22 0.62 0.37"   size="0.04 0.04 0.37" material="mat_table_dark" contype="0" conaffinity="0" />
+    <geom name="table_leg4" type="box" pos="1.22 -0.62 0.37"  size="0.04 0.04 0.37" material="mat_table_dark" contype="0" conaffinity="0" />
+
+    <!-- ===== 球网 (x=0, 高 0.1525, 宽 1.83, 可碰撞) ===== -->
+    <geom name="net" type="box" pos="0 0 0.8365" size="0.0018 0.915 0.0765"
+          material="mat_net" contype="1" conaffinity="1" condim="3"
+          friction="0.4 0.005 0.0001" solref="0.004 0.5" margin="0.002" />
+    <geom name="net_post1" type="cylinder" pos="0 0.9325 0.846" size="0.0075 0.086" rgba="0.15 0.15 0.17 1" contype="0" conaffinity="0" />
+    <geom name="net_post2" type="cylinder" pos="0 -0.9325 0.846" size="0.0075 0.086" rgba="0.15 0.15 0.17 1" contype="0" conaffinity="0" />
+
+    <!-- ===== 发球机 (台端外, 视觉模型) ===== -->
+    <geom name="launcher_body" type="box" pos="1.68 0 1.02" size="0.09 0.06 0.06"
+          material="mat_launcher" contype="0" conaffinity="0" />
+    <geom name="launcher_barrel" type="cylinder" pos="1.58 0 1.02" size="0.03 0.07" euler="0 1.5708 0"
+          rgba="0.2 0.21 0.24 1" contype="0" conaffinity="0" />
+    <geom name="launcher_post" type="cylinder" pos="1.68 0 0.4" size="0.03 0.62"
+          material="mat_launcher" contype="0" conaffinity="0" />
+
+    <!-- ===== 机器人安装龙门 (视觉模型) ===== -->
+    <geom name="gantry_beam" type="box" pos="-1.09 0 1.225" size="0.42 0.035 0.035"
+          rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
+    <geom name="gantry_post" type="box" pos="-1.49 0 0.6225" size="0.035 0.035 0.6225"
+          rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
+    <geom name="gantry_post2" type="box" pos="-1.49 0.35 0.6225" size="0.035 0.035 0.6225"
+          rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
+    <geom name="gantry_post3" type="box" pos="-1.49 -0.35 0.6225" size="0.035 0.035 0.6225"
+          rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
+    <geom name="gantry_beam2" type="box" pos="-1.49 0 1.225" size="0.035 0.385 0.035"
+          rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
+
+    <!-- ===== 乒乓球 (40mm / 2.7g, 空气阻力) ===== -->
+    <body name="ball" pos="1.58 0 1.02">
+      <freejoint name="ball_joint" />
+      <inertial pos="0 0 0" mass="0.0027" diaginertia="4.32e-7 4.32e-7 4.32e-7" />
+      <geom name="ball_geom" type="sphere" size="0.02" mass="0.0027" rgba="1 0.93 0.93 1"
+            fluidshape="ellipsoid" contype="1" conaffinity="1" condim="3"
+            friction="0.6 0.005 0.0001" solref="0.003 0.3" solimp="0.9 0.95 0.001" margin="0.0005" />
+      <site name="ball_center" pos="0 0 0" size="0.003" rgba="1 0.25 0.25 1" />
+    </body>
+  </worldbody>
+
+  <!-- 机器人 (含球拍), 由 delta_robot.xml 自动生成 -->
+  <include file="delta_robot_paddle.xml" />
+
+  <!-- 显式接触对: 球-拍面(胶皮), 球-台面 -->
+  <contact>
+    <pair name="ball_paddle_face" geom1="ball_geom" geom2="paddle_face" condim="3"
+          friction="1.8 0.02 0.005" solref="0.0025 0.25" solimp="0.99 0.999 0.0001 0.5 2"
+          margin="0.0015" />
+    <pair name="ball_table" geom1="ball_geom" geom2="table_top" condim="3"
+          friction="0.35 0.005 0.0001" solref="0.0095 0.04" solimp="0.9 0.95 0.003 0.5 2"
+          margin="0.001" />
+  </contact>
+
+  <sensor>
+    <framepos    name="ball_pos"     objtype="site" objname="ball_center" />
+    <framelinvel name="ball_lin_vel" objtype="site" objname="ball_center" />
+    <framepos    name="paddle_pos"     objtype="site" objname="paddle_center" reftype="site" refname="base_center" />
+    <framelinvel name="paddle_lin_vel" objtype="site" objname="paddle_center" reftype="site" refname="base_center" />
+  </sensor>
+</mujoco>

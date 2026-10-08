@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- scene_draw.xml — Delta 机械臂末端轨迹绘制仿真场景
+     机器人经 <include> 引入 delta_robot.xml (共享定义);
+     基座世界安装位置由 Python 加载后设置 (默认 0 0 0.60, 见 run_trajectory.py) -->
+<mujoco model="delta_draw">
+  <compiler angle="radian" coordinate="local" inertiafromgeom="auto" meshdir="meshes" />
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast"
+          iterations="100" ls_iterations="50" />
+
+  <visual>
+    <global offwidth="1920" offheight="1080" />
+  </visual>
+
+  <worldbody>
+    <light pos="0.4 0.4 1.6" dir="-0.3 -0.3 -1" diffuse="0.9 0.9 0.9" />
+    <light pos="-0.4 0.2 1.4" dir="0.3 -0.2 -1" diffuse="0.5 0.5 0.55" />
+    <geom name="floor" type="plane" size="0.8 0.8 0.05" material="mat_grid" />
+    <geom name="frame_post" type="box" pos="0.17 0.17 0.30" size="0.02 0.02 0.30"
+          rgba="0.35 0.37 0.40 1" contype="0" conaffinity="0" />
+    <geom name="frame_post2" type="box" pos="-0.17 -0.17 0.30" size="0.02 0.02 0.30"
+          rgba="0.35 0.37 0.40 1" contype="0" conaffinity="0" />
+    <geom name="frame_post3" type="box" pos="0.17 -0.17 0.30" size="0.02 0.02 0.30"
+          rgba="0.35 0.37 0.40 1" contype="0" conaffinity="0" />
+    <geom name="frame_post4" type="box" pos="-0.17 0.17 0.30" size="0.02 0.02 0.30"
+          rgba="0.35 0.37 0.40 1" contype="0" conaffinity="0" />
+  </worldbody>
+
+  <include file="delta_robot.xml" />
+</mujoco>

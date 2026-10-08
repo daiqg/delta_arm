@@ -1,0 +1,15 @@
+{
+  "shape": "circle",
+  "name": "圆形 r=55mm",
+  "mean": 4.4978117055696105e-05,
+  "rms": 4.7073717550525455e-05,
+  "mx": 9.050909689904614e-05,
+  "z_max_m": 4.3014501769772506e-05,
+  "z_peak_to_peak_m": 2.7584863034835205e-05,
+  "z_error_step_max_m": 4.3114820547085486e-08,
+  "closure_max_m": 5.250523415012099e-05,
+  "actuator_peak_nm": 0.1888174789369259,
+  "samples": 5001,
+  "sample_period_s": 0.001,
+  "completed": true
+}
