@@ -2,59 +2,59 @@
 
 本目录是独立的 Delta 机械臂 MuJoCo 仿真模块。长度、质量、时间、速度、力矩分别使用 m、kg、s、m/s、N·m；关节角在代码和 XML 中使用 rad，文档中的角度会标明单位。完整设计与验证记录见[工作总结](../WORK_SUMMARY.md)。
 
-已清理开发期 `debug_*.py` 和独立 `calibrate_*.py` 扫描脚本。日常使用入口为模型预览、运动学校验、轨迹绘制和两种击球脚本；击球所需的运行时碰撞标定仍在 `run_hitting.py` 中自动执行。
+建议先按[快速复现流程](../README.md)完成模型检查、轨迹绘制和连续击球，再查阅本指南中的参数和输出说明。
 
 ## 1. 环境与启动
 
-在仓库根目录使用已有的 Conda 环境：
+以下步骤面向 Windows 64 位和 PowerShell。先安装 Git、Miniconda，并确认 `git --version`、`conda --version` 可执行。若 PowerShell 不识别 Conda，在 Miniconda Prompt 中执行 `conda init powershell` 后重开 PowerShell。
+
+从尚未克隆项目的目录开始，按顺序执行：
 
 ```powershell
-conda activate mujoco-sim-win
+git clone https://github.com/daiqg/delta_arm.git
+cd delta_arm
 cd delta_sim
-```
-
-开发机器的该环境解释器为 `D:\anaconda3\envs\mujoco-sim-win\python.exe`，已验证 MuJoCo 3.6.0；其他电脑路径不同，不需要使用这个绝对路径。本机激活环境时会自动检查 MuJoCo/viewer 并显示路径和版本。
-
-没有此环境的 Windows 电脑，在本目录执行：
-
-```powershell
 conda env create -f environment_win.yml
 conda activate mujoco-sim-win
 python -m pip install mujoco==3.6.0
 ```
 
-[environment_win.yml](environment_win.yml) 从原项目原样迁入，包含 Python 3.11、NumPy <2、SciPy、Matplotlib、quaternion、MKL、MuJoCo、PyTorch CPU 及 pygame。它保留了原环境的较完整依赖，其中部分依赖不是新版仿真的必需项；文件并未锁定所有版本，也不是现有环境的精确导出。创建后固定 MuJoCo 3.6.0，便于对比现有碰撞结果。
+若已完成[根目录 README](../README.md) 的安装步骤，无需重复执行本节。`environment_win.yml` 必须在当前目录存在；已克隆仓库时直接进入其 `delta_sim/` 子目录，已创建同名环境时跳过创建步骤。
 
-已有环境不必重新创建。确需按 YAML 补齐依赖时，可执行 `conda env update -n mujoco-sim-win -f environment_win.yml`，随后重新固定 MuJoCo 版本。本机自动检查由环境内 `etc/conda/activate.d` 中的脚本提供，YAML 不包含这些脚本，其他电脑不会自动获得该提示。
+[environment_win.yml](environment_win.yml) 包含 Python 3.11、NumPy <2、SciPy、Matplotlib、quaternion、MKL、MuJoCo、PyTorch CPU 及 pygame。其中部分依赖用于兼容原有环境，并非新版仿真必需。该配置不是全部版本锁定的环境快照，因此安装后单独固定 MuJoCo 3.6.0，便于对比现有接触结果。
 
-只需补齐新版仿真的最低依赖时：
+后文所有命令均在已激活的环境和 `delta_arm/delta_sim/` 目录中执行。激活环境本身不要求输出版本信息；第 2 节的校验和模型预览用于检查计算与图形功能。图形窗口和离屏截图需要可用的 OpenGL 驱动/上下文。IDE 应选择 `mujoco-sim-win` 的 Python 解释器。
+
+### 已有环境与后续运行
+
+重新打开终端后，进入仓库的 `delta_sim/` 目录，再执行 `conda activate mujoco-sim-win` 即可运行，无需重新安装。
+
+已有同名环境若缺少依赖，可以在本目录补齐：
 
 ```powershell
-python -m pip install -r requirements.txt
+conda env update -n mujoco-sim-win -f environment_win.yml
+conda activate mujoco-sim-win
+python -m pip install mujoco==3.6.0
 ```
 
-要复现开发机器的 MuJoCo 接触版本，再执行 `python -m pip install mujoco==3.6.0`。其余依赖尚未锁定，完整环境复现仍需记录版本。
+`requirements.txt` 仅列出新版仿真的最低 Python 依赖；完整 Windows 安装流程以上述 YAML 为准。版本变化可能影响碰撞落点，比较实验时应记录实际依赖版本。
 
-`requirements.txt` 指定最低依赖版本，并未锁定版本。MuJoCo 版本变化会影响接触与落点；对比实验时应固定并记录实际版本。
-
-不能在当前终端激活 Conda 时，可从本目录执行：
+不使用终端激活时，可以在本目录用以下命令替代对应的运行命令：
 
 ```powershell
 conda run --no-capture-output -n mujoco-sim-win python run_trajectory.py --shape all
 conda run --no-capture-output -n mujoco-sim-win python continuous_hitting.py --nballs 10
 ```
 
-后文命令均假设已激活环境且位于本目录。
-
 ## 2. 模型预览与校验
 
 ```powershell
+python verify_kinematics.py
 python preview_model.py
 python preview_model.py --paddle
-python verify_kinematics.py
 ```
 
-预览先保存截图，再打开静态 MuJoCo 窗口；它不执行轨迹或击球。默认隐藏遮挡机械臂的外部安装架，仅影响显示。
+校验应输出 `CAD geometry check: 36 mesh components`，随后给出 FK/IK、闭环与重力保持结果。每个预览命令先保存截图，再打开静态 MuJoCo 窗口；关闭当前窗口后再执行下一条命令。预览不执行轨迹或击球，默认隐藏遮挡机械臂的外部安装架，仅影响显示。
 
 | 预览选项 | 用途 |
 | --- | --- |
@@ -188,8 +188,10 @@ python run_hitting.py --n 20 --seed 1000
 
 | 现象 | 处理 |
 | --- | --- |
-| `module 'mujoco' has no attribute 'viewer'` | viewer 是子模块；现有脚本已显式导入。本机可重新激活环境查看自动检查结果，并运行当前脚本 |
-| 看不到窗口 / IDE 使用了其他环境 | 检查 `sys.executable`，切换到 `mujoco-sim-win`；可使用上面的 `conda run --no-capture-output` |
+| `module 'mujoco' has no attribute 'viewer'` | viewer 是子模块；现有脚本已显式导入。激活按第 1 节创建的环境，运行仓库中的当前脚本；自编脚本应显式使用 `import mujoco.viewer` |
+| 看不到窗口 / IDE 使用了其他环境 | 在终端激活 `mujoco-sim-win`，或在 IDE 选择该环境；可使用第 1 节的 `conda run --no-capture-output` |
+| `conda env create` 提示环境已存在 | 跳过创建步骤并激活同名环境；缺依赖时按第 1 节更新环境 |
+| 找不到脚本或 `environment_win.yml` | 确认当前目录为克隆仓库中的 `delta_sim/` |
 | 第一球迟迟未动 | 首球先做标定、预测与拍速搜索；查看终端。不能仅凭短暂等待判定卡死 |
 | 全部运行结束但终端未退出 | 最终窗口按设计保留；轨迹可用 `--auto-close`，击球需关闭窗口 |
 | 击球 JSON 还是上次结果 | 本轮需关闭窗口后才保存；检查 JSON 的实际球数 |
