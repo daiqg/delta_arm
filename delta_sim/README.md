@@ -11,10 +11,23 @@
 ```powershell
 conda activate mujoco-sim-win
 cd delta_sim
-python -c "import sys, mujoco, mujoco.viewer; print(sys.executable); print(mujoco.__version__)"
 ```
 
-开发机器的该环境解释器为 `D:\anaconda3\envs\mujoco-sim-win\python.exe`，已验证 MuJoCo 3.6.0；其他电脑路径不同，不需要使用这个绝对路径。没有此环境时，先执行 `conda create -n mujoco-sim-win python=3.11 -y` 再激活。缺少依赖时：
+开发机器的该环境解释器为 `D:\anaconda3\envs\mujoco-sim-win\python.exe`，已验证 MuJoCo 3.6.0；其他电脑路径不同，不需要使用这个绝对路径。本机激活环境时会自动检查 MuJoCo/viewer 并显示路径和版本。
+
+没有此环境的 Windows 电脑，在本目录执行：
+
+```powershell
+conda env create -f environment_win.yml
+conda activate mujoco-sim-win
+python -m pip install mujoco==3.6.0
+```
+
+[environment_win.yml](environment_win.yml) 从原项目原样迁入，包含 Python 3.11、NumPy <2、SciPy、Matplotlib、quaternion、MKL、MuJoCo、PyTorch CPU 及 pygame。它保留了原环境的较完整依赖，其中部分依赖不是新版仿真的必需项；文件并未锁定所有版本，也不是现有环境的精确导出。创建后固定 MuJoCo 3.6.0，便于对比现有碰撞结果。
+
+已有环境不必重新创建。确需按 YAML 补齐依赖时，可执行 `conda env update -n mujoco-sim-win -f environment_win.yml`，随后重新固定 MuJoCo 版本。本机自动检查由环境内 `etc/conda/activate.d` 中的脚本提供，YAML 不包含这些脚本，其他电脑不会自动获得该提示。
+
+只需补齐新版仿真的最低依赖时：
 
 ```powershell
 python -m pip install -r requirements.txt
@@ -175,7 +188,7 @@ python run_hitting.py --n 20 --seed 1000
 
 | 现象 | 处理 |
 | --- | --- |
-| `module 'mujoco' has no attribute 'viewer'` | viewer 是子模块；现有脚本已显式导入。用环境检查命令确认 `mujoco.viewer` 可导入，并运行当前脚本 |
+| `module 'mujoco' has no attribute 'viewer'` | viewer 是子模块；现有脚本已显式导入。本机可重新激活环境查看自动检查结果，并运行当前脚本 |
 | 看不到窗口 / IDE 使用了其他环境 | 检查 `sys.executable`，切换到 `mujoco-sim-win`；可使用上面的 `conda run --no-capture-output` |
 | 第一球迟迟未动 | 首球先做标定、预测与拍速搜索；查看终端。不能仅凭短暂等待判定卡死 |
 | 全部运行结束但终端未退出 | 最终窗口按设计保留；轨迹可用 `--auto-close`，击球需关闭窗口 |

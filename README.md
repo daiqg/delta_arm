@@ -19,17 +19,19 @@ cd delta_arm
 ```powershell
 conda activate mujoco-sim-win
 cd delta_sim
-python -c "import sys, mujoco, mujoco.viewer; print(sys.executable); print(mujoco.__version__)"
 ```
 
-已有的 `mujoco-sim-win` 环境已验证 MuJoCo 3.6.0。其他电脑可先创建环境：
+已有的 `mujoco-sim-win` 环境可直接使用。本机激活时会自动显示 Python 路径、MuJoCo 版本和 viewer 导入结果。
+
+其他 Windows 电脑进入 `delta_sim/` 后，使用 [environment_win.yml](delta_sim/environment_win.yml) 创建环境：
 
 ```powershell
-conda create -n mujoco-sim-win python=3.11 -y
+conda env create -f environment_win.yml
 conda activate mujoco-sim-win
-python -m pip install -r requirements.txt
 python -m pip install mujoco==3.6.0
 ```
+
+YAML 从原项目迁入，保留 Python 3.11、NumPy <2、PyTorch CPU 等原有依赖；它是安装配置，并非完整版本快照。最后一条命令固定为本项目已验证的 MuJoCo 3.6.0。本机激活自动检查属于环境内的 `etc/conda/activate.d` 脚本，不会通过 YAML 自动安装到其他电脑。
 
 已有环境缺少依赖时执行：
 
