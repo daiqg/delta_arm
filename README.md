@@ -2,6 +2,18 @@
 
 本项目使用 MuJoCo 实现 Delta 机械臂末端轨迹绘制，以及末端刚性安装乒乓球拍后的击球仿真。仓库包含运行所需的代码、场景和 CAD 网格，无需下载其他项目。
 
+## 当前在线击球入口
+
+```powershell
+cd delta_arm\delta_sim
+conda activate mujoco-sim-win
+python continuous_hitting.py --nballs 10
+```
+
+`continuous_hitting.py` 是默认的因果在线方案。发球只经过乒乓规则与静态工作空间检查；发球后控制器只接收延迟位置观测和关节反馈，不读取真实球速度、未来轨迹，也不在主机器人模型中预演回球。默认设置为 80 ms 观测延迟、2 mm 位置噪声和 120 ms 重规划周期，结果写入 `results/online_10_*`。蓝色虚线为当前在线预测，橙色实线为实际球路。
+
+`continuous_hitting_rehearsal.py` 保留旧的离线预演筛选实现，仅作接触模型回归基准；它的成功率不能代表在线控制性能。
+
 下面按顺序完成环境安装、模型检查、轨迹运行和连续击球。命令面向 **Windows 64 位 + PowerShell**。
 
 ## 1. 准备工具

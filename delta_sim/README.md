@@ -2,6 +2,16 @@
 
 本目录是独立的 Delta 机械臂 MuJoCo 仿真模块。长度、质量、时间、速度、力矩分别使用 m、kg、s、m/s、N·m；关节角在代码和 XML 中使用 rad，文档中的角度会标明单位。完整设计与验证记录见[工作总结](../WORK_SUMMARY.md)。
 
+## 在线连续击球
+
+```powershell
+python continuous_hitting.py --nballs 10
+```
+
+默认入口执行因果在线控制，结果为 `results/online_10_balls.csv`、`online_10_trajectories.csv`、`online_10_summary.json` 与 `online_10_final.png`。随机发球只检查规范的两次落台、过网和静态工作空间相交；回球不会在发球前预演筛选。控制器以 80 ms 延迟、2 mm 高斯位置噪声的观测更新状态，按 120 ms 周期重规划；完整 Python 计算时间计入截止判断。可通过 `--measurement-delay-ms`、`--measurement-noise-mm` 和 `--control-period-ms` 修改这些量。
+
+`continuous_hitting_rehearsal.py` 是保留的离线预演基准，不能用于报告在线成功率。
+
 建议先按[快速复现流程](../README.md)完成模型检查、轨迹绘制和连续击球，再查阅本指南中的参数和输出说明。
 
 ## 1. 环境与启动
