@@ -31,14 +31,9 @@ conda activate mujoco-sim-win
 
 **后续命令均在同一个终端、`delta_arm/delta_sim/` 目录中执行。** 每一步成功后再继续。如果环境已存在，跳过创建步骤，激活后确认依赖可用；不要重复创建同名环境。IDE 运行时也应选择该 Conda 环境的解释器。
 
-## 3. 检查模型
+## 3. 查看模型
 
-```powershell
-python verify_kinematics.py
-python verify_paddle_mount.py
-```
-
-第一条命令会输出 `CAD geometry check: 36 mesh components`，以及 FK/IK 误差、闭环残差、3 秒重力保持和工作空间扫描结果。第二条命令在四个位姿核对球拍与末端中心的安装关系：拍柄沿世界 -Z，拍面竖直、法向世界 +X，拍心位于末端中心正下方 170 mm。
+拍柄沿世界 -Z，拍面竖直、法向世界 +X，拍心位于末端中心正下方 170 mm。
 
 查看带球拍的模型：
 
@@ -79,7 +74,6 @@ python continuous_hitting.py --nballs 30
 ```powershell
 python continuous_hitting.py --nballs 30 --headless --no-realtime --output results/my_run
 Get-Content results/my_run/online_30_summary.json
-python verify_online_control.py
 ```
 
 发球只按双方落台、过网及工作空间相交筛选，**不会试打或预先筛选回球**。控制器只接收已送达位置观测，初态真值、真值球速和未来球路不进入控制器。发球范围保持旧在线版的小幅随机族，不扩大或缩小范围来调整本轮成功率；该范围并不代表任意随机来球。
@@ -115,7 +109,7 @@ MuJoCo 3.6.0、种子 `20261007`、80 ms 观测延迟、2 mm 测量噪声下，�
 - `continuous_hitting.py`、`online_control.py`：在线预测、滚动规划及连续击球。
 - `run_hitting.py`、`kinematics.py`、XML 和 `meshes/`：共享物理场景、运动学和 CAD 资源，不应删除。
 - `continuous_hitting_rehearsal.py`：保留的离线预演对照，在线入口还复用其发球机定位函数。
-- `make_paddle_robot.py`、`preview_model.py`、`verify_*.py`：模型生成、查看和必要校验。
+- `make_paddle_robot.py`、`preview_model.py`：模型生成与查看。
 - `results/`：参考结果；新增临时实验默认不加入 Git，避免调参输出混入发布版本。
 
 本仓库可独立运行，不依赖旁边的旧项目目录。详细设计和历史问题记录仍保留在工作总结与在线优化记录中。

@@ -22,7 +22,6 @@ python continuous_hitting.py --nballs 10
 ```powershell
 python continuous_hitting.py --nballs 10 --headless --no-realtime --output results/my_run
 Get-Content results/my_run/online_10_summary.json
-python verify_online_control.py
 ```
 
 发球只按双方落台、过网及工作空间相交筛选，**不会试打或预先筛选回球**。控制器只接收已送达位置观测，初态真值、真值球速和未来球路不进入控制器。发球范围保持旧在线版的小幅随机族，不扩大或缩小范围来调整本轮成功率；该范围并不代表任意随机来球。

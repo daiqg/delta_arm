@@ -20,7 +20,7 @@ conda activate mujoco-sim-win
 
 [environment_win.yml](environment_win.yml) 仅包含 Python 3.11、NumPy >=1.24 且 <2、Matplotlib >=3.7、pip 和 MuJoCo 3.6.0。MuJoCo 在环境创建时直接固定版本，便于对比现有接触结果；其余依赖及间接依赖并未全部锁定。
 
-后文所有命令均在已激活的环境和 `delta_arm/delta_sim/` 目录中执行。激活环境本身不要求输出版本信息；第 2 节的校验和模型预览用于检查计算与图形功能。图形窗口和离屏截图需要可用的 OpenGL 驱动/上下文。IDE 应选择 `mujoco-sim-win` 的 Python 解释器。
+后文所有命令均在已激活的环境和 `delta_arm/delta_sim/` 目录中执行。激活环境本身不要求输出版本信息；第 2 节的模型预览用于查看模型和图形功能。图形窗口和离屏截图需要可用的 OpenGL 驱动/上下文。IDE 应选择 `mujoco-sim-win` 的 Python 解释器。
 
 ### 已有环境与后续运行
 
@@ -42,16 +42,14 @@ conda run --no-capture-output -n mujoco-sim-win python run_trajectory.py --shape
 conda run --no-capture-output -n mujoco-sim-win python continuous_hitting.py --nballs 10
 ```
 
-## 2. 模型预览与校验
+## 2. 模型预览
 
 ```powershell
-python verify_kinematics.py
-python verify_paddle_mount.py
 python preview_model.py
 python preview_model.py --paddle
 ```
 
-第一条校验应输出 `CAD geometry check: 36 mesh components`，随后给出 FK/IK、闭环与重力保持结果。第二条在四个位姿验证安装变换：夹具中心与 `ee_center` 重合，拍心相对其为 (0, 0, -0.170) m，拍柄沿世界 -Z，拍面法向为世界 +X。每个预览命令先保存截图，再打开静态 MuJoCo 窗口；关闭当前窗口后再执行下一条命令。预览不执行轨迹或击球，默认隐藏遮挡机械臂的外部安装架，仅影响显示。
+夹具中心与 `ee_center` 重合，拍心相对其为 (0, 0, -0.170) m，拍柄沿世界 -Z，拍面法向为世界 +X。每个预览命令先保存截图，再打开静态 MuJoCo 窗口；关闭当前窗口后再执行下一条命令。预览不执行轨迹或击球，默认隐藏遮挡机械臂的外部安装架，仅影响显示。
 
 | 预览选项 | 用途 |
 | --- | --- |
@@ -125,7 +123,6 @@ python continuous_hitting.py --nballs 10
 ```powershell
 python continuous_hitting.py --nballs 10 --headless --no-realtime --output results/my_run
 Get-Content results/my_run/online_10_summary.json
-python verify_online_control.py
 ```
 
 发球只按双方落台、过网及工作空间相交筛选，**不会试打或预先筛选回球**。控制器只接收已送达位置观测，初态真值、真值球速和未来球路不进入控制器。发球范围保持旧在线版的小幅随机族，不扩大或缩小范围来调整本轮成功率；该范围并不代表任意随机来球。

@@ -24,7 +24,6 @@
 | `continuous_hitting.py` | 随机合规来球筛选、候选回球预演、连续播放与数据导出 |
 | `trajectory_view.py` | MuJoCo 场景中的期望与实际路径叠加 |
 | `preview_model.py` | 静态模型预览与截图 |
-| `verify_kinematics.py`、`verify_paddle_mount.py` | CAD 类型、运动学、闭环及球拍安装校验 |
 | `environment_win.yml`、`requirements.txt` | 安装依赖；MuJoCo 固定为 3.6.0 |
 | `results/` | 当前模型截图、五形状数据和随机 10 球结果 |
 
