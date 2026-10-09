@@ -103,14 +103,70 @@ MuJoCo 3.6.0、种子 `20261007`、80 ms 观测延迟、2 mm 测量噪声下，�
 
 该指标要求不触网并留有过网余量，比正式规则严格；每球重置后再发球，不是双方连续对拉。单轮结果不代表任意来球成功率，也不保证不同机器负载下结果完全相同。完整记录见 [30 球结果](delta_sim/results/online_30_validation/online_30_summary.json)及同目录逐球 CSV、轨迹、控制日志和截图。它与此前三个种子各 10 球的统计不同，且默认种子的前 10 球重叠，不能视为独立测试相加。
 
-### 文件用途
+### 文件树与用途
 
-- `run_trajectory.py`、`trajectory_view.py`：五种末端轨迹与 MuJoCo 可视化。
-- `continuous_hitting.py`、`online_control.py`：在线预测、滚动规划及连续击球。
-- `run_hitting.py`、`kinematics.py`、XML 和 `meshes/`：共享物理场景、运动学和 CAD 资源，不应删除。
-- `continuous_hitting_rehearsal.py`：保留的离线预演对照，在线入口还复用其发球机定位函数。
-- `make_paddle_robot.py`、`preview_model.py`：模型生成与查看。
-- `results/`：参考结果；新增临时实验默认不加入 Git，避免调参输出混入发布版本。
+下面以克隆后的仓库根目录 `delta_arm/` 为起点。所有运行命令在 `delta_sim/` 中执行。编号 CAD 零件及五种轨迹的同类输出采用花括号合并列出；例如 `{1,2,3}` 表示三个独立文件，并非实际文件名。
+
+```text
+delta_arm/
+├── .gitattributes                         # Git 文本文件换行等属性
+├── .gitignore                            # 排除缓存、日志及临时实验输出
+├── README.md                             # 从安装到运行的复现指南（本文）
+├── WORK_SUMMARY.md                       # 仿真结构、历史结果、问题与解决方案
+├── ONLINE_OPTIMIZATION.md                # 在线控制优化过程、验证结果和指标边界
+├── online_validation.json               # 早期三个种子各 10 球的在线验证摘要
+└── delta_sim/
+    ├── README.md                         # 参数、单位、坐标系、输出字段及排错详解
+    ├── environment_win.yml               # Windows Conda 环境定义
+    ├── requirements.txt                  # pip 依赖及版本约束
+    ├── run_trajectory.py                 # 核心入口①：五种末端轨迹、跟踪控制与结果导出
+    ├── continuous_hitting.py             # 核心入口②：在线连续发球/回球、可视化与统计
+    ├── online_control.py                 # 延迟观测估计、球路预测、滚动规划及安全约束
+    ├── run_hitting.py                    # 共享击球物理与规划工具、碰撞和落台判定
+    ├── continuous_hitting_rehearsal.py    # 离线预演对照；在线入口复用其发球机定位函数
+    ├── kinematics.py                     # Delta 正/逆运动学、限位及 MuJoCo 关节接口
+    ├── trajectory_view.py                # 在 MuJoCo 中叠加期望/实际轨迹并配置视角
+    ├── make_paddle_robot.py              # 生成刚性安装球拍的机械臂 XML 模型
+    ├── preview_model.py                  # 静态模型预览及截图入口
+    ├── delta_robot.xml                   # Delta 机械臂：刚体、关节、驱动及闭环约束
+    ├── delta_robot_paddle.xml            # 带夹具和竖直球拍的机械臂模型
+    ├── scene_draw.xml                    # 末端轨迹绘制场景
+    ├── scene_pingpong.xml                # 击球场景：机械臂、球台、球网、发球机和球
+    ├── meshes/                           # XML 引用的 CAD 网格，属于运行依赖
+    │   ├── delta_base_board_{1,2}.STL    # 固定基座板件
+    │   ├── delta_base_motor_{1,2,3}.STL  # 三个基座电机的外形
+    │   ├── delta_elbow_{1,2,3}_frame_base_1.STL   # 三条支链的支架底座
+    │   ├── delta_elbow_{1,2,3}_motor_frame_1.STL  # 三条支链的电机支架
+    │   ├── delta_elbow_{1,2,3}_connector_1.STL    # 三条支链的连接件
+    │   ├── delta_elbow_{1,2,3}_upper_arm_1.STL    # 三条支链的主动上臂
+    │   ├── delta_elbow_{1,2,3}_balljoint_{1,2}.STL # 上臂端六个球铰零件
+    │   ├── delta_lower_arm_{1,2,4,5,6}.STL       # 前臂杆件；一个网格复用于两根杆
+    │   ├── delta_end_balljoint_{1,2,3,4,5,6}.STL # 末端平台的六个球铰零件
+    │   └── delta_end_1.STL               # 末端动平台
+    └── results/                          # 保留的参考输出；再次运行可能覆盖同名文件
+        ├── model_delta.png               # 机械臂模型预览截图
+        ├── model_paddle.png              # 机械臂与球拍预览截图
+        ├── traj_{circle,square,figure8,star,helix}.csv
+        │                                 # 各轨迹的时间、期望位置、实际位置及误差
+        ├── traj_{circle,square,figure8,star,helix}.png
+        │                                 # 各轨迹的路径与跟踪误差图表
+        ├── traj_{circle,square,figure8,star,helix}_metrics.json
+        │                                 # 各轨迹完成状态及误差统计（长度单位 m）
+        ├── traj_{circle,square,figure8,star,helix}_mujoco.png
+        │                                 # 各轨迹的 MuJoCo 场景截图
+        ├── random_10_balls.csv            # 离线预演对照的逐球指标
+        ├── random_10_summary.json         # 离线预演对照摘要，不能作为在线成功率
+        ├── random_10_trajectories.csv     # 离线预演对照的运动轨迹
+        ├── random_10_final.png            # 离线预演对照的最终场景截图
+        └── online_30_validation/          # 当前在线方案一轮 30 球的完整参考记录
+            ├── online_30_balls.csv        # 逐球发球、接触、回球、估计及运动约束指标
+            ├── online_30_summary.json     # 26/30 规范回球及运行设置、约束汇总
+            ├── online_30_trajectories.csv # 球与拍心等随时间变化的轨迹数据
+            ├── online_30_controller.json # 每次规划的观测、计算耗时与发布时间记录
+            └── online_30_final.png        # 本轮验证的最终 MuJoCo 场景截图
+```
+
+在线版在内存中将球拍碰撞几何改为平面椭圆柱，逻辑位于 `online_control.py`；预演版仍使用原 XML 碰撞几何。`meshes/` 中的球铰 STL 是关节零件外形，并非用球体代替整条机械臂。
 
 本仓库可独立运行，不依赖旁边的旧项目目录。详细设计和历史问题记录仍保留在工作总结与在线优化记录中。
 
