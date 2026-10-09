@@ -13,26 +13,42 @@ import numpy as np
 
 import kinematics as kin
 from run_hitting import (BASE_POS, BALL_R, FACE_CLEAR, HOME_PLAT, N, NET_TOP,
-                        P_OFF, QDOT_MAX, RAMP_T, RECOVER_T, TABLE_TOP,
+                        P_OFF, QDOT_MAX, RECOVER_T, TABLE_TOP,
                         V_PAD_MAX, WINDOW, Z_FLOOR_REL, ball_qv, set_ball)
 
 
-def ball_model(paddle=False):
-    """Reuse scene contact/aerodynamic settings without the robot mechanism."""
+# Online stroke settings; the preserved rehearsal uses its original ramp.
+RAMP_T = .03
+COMPUTE_BUDGET = .10
+
+def flat_paddle_model():
+    """Exact planar rubber faces with the existing 170 x 150 x 12 mm outline."""
+    root = ET.parse(Path(__file__).with_name('scene_pingpong.xml')).getroot()
+    included = ET.parse(Path(__file__).with_name('delta_robot_paddle.xml')).getroot()
+    root.remove(root.find('include'))
+    for node in included:
+        target = root.find(node.tag)
+        if target is None:
+            root.append(node)
+        else:
+            target.extend(list(node))
+    angles = np.arange(64)*2*np.pi/64
+    vertices = np.array([[.085*np.cos(a), .075*np.sin(a), z]
+                         for z in (-.006,.006) for a in angles])
+    ET.SubElement(root.find('asset'), 'mesh', name='flat_blade_contact',
+                  vertex=' '.join(map(str,vertices.ravel())))
+    face = root.find(".//geom[@name='paddle_face']")
+    face.set('type','mesh');face.set('mesh','flat_blade_contact');face.attrib.pop('size')
+    return root
+
+
+def ball_model():
+    """Ball-only prediction scene with the plant's air/table parameters."""
     root = ET.parse(Path(__file__).with_name('scene_pingpong.xml')).getroot()
     root.remove(root.find('include'))
     root.remove(root.find('sensor'))
     contacts = root.find('contact')
-    pair = contacts.find("pair[@name='ball_paddle_face']")
-    if not paddle:
-        contacts.remove(pair)
-    else:
-        body = ET.SubElement(root.find('worldbody'), 'body', name='predict_paddle')
-        ET.SubElement(body, 'freejoint', name='predict_paddle_joint')
-        ET.SubElement(body, 'inertial', pos='0 0 0', mass='0.167',
-                      diaginertia='0.0007 0.0004 0.0003')
-        ET.SubElement(body, 'geom', name='paddle_face', type='ellipsoid',
-                      size='0.006 0.075 0.085', contype='0', conaffinity='0')
+    contacts.remove(contacts.find("pair[@name='ball_paddle_face']"))
     return mujoco.MjModel.from_xml_string(ET.tostring(root, encoding='unicode'))
 
 
@@ -61,12 +77,15 @@ class PositionEstimator:
         self.count += 1
         if self.timestamp is None:
             self.history.append((t, position.copy()))
-            if len(self.history) < 4:
+            if len(self.history) < 8:
                 return
             times = np.array([s[0] - t for s in self.history])
-            coefficients = np.polynomial.polynomial.polyfit(
-                times, np.array([s[1] for s in self.history]), 2)
-            set_ball(self.data, self.qadr, self.vadr, coefficients[0], coefficients[1])
+            positions = np.array([s[1] for s in self.history])
+            positions[:,2] += 4.905*times**2
+            centred = times-times.mean()
+            velocity = np.sum(centred[:,None]*positions,axis=0)/(centred@centred)
+            position = positions.mean(axis=0)-velocity*times.mean()
+            set_ball(self.data, self.qadr, self.vadr, position, velocity)
             self.timestamp = t
             mujoco.mj_forward(self.model, self.data)
             return
@@ -75,8 +94,8 @@ class PositionEstimator:
             mujoco.mj_step(self.model, self.data)
         innovation = position - self.data.qpos[self.qadr:self.qadr+3]
         self.last_innovation = float(np.linalg.norm(innovation))
-        self.data.qpos[self.qadr:self.qadr+3] += 0.65 * innovation
-        self.data.qvel[self.vadr:self.vadr+3] += 0.12 / duration * innovation
+        self.data.qpos[self.qadr:self.qadr+3] += 0.35 * innovation
+        self.data.qvel[self.vadr:self.vadr+3] += 0.04 / duration * innovation
         self.timestamp = t
         mujoco.mj_forward(self.model, self.data)
 
@@ -93,13 +112,6 @@ class FlightPredictor:
         self.model = ball_model()
         self.data = mujoco.MjData(self.model)
         self.qadr, self.vadr = ball_qv(self.model)
-        self.contact_model = ball_model(paddle=True)
-        self.contact_data = mujoco.MjData(self.contact_model)
-        self.cq, self.cv = ball_qv(self.contact_model)
-        joint = self.contact_model.joint('predict_paddle_joint').id
-        self.pq = self.contact_model.jnt_qposadr[joint]
-        self.pv = self.contact_model.jnt_dofadr[joint]
-
     def incoming(self, state, now, horizon=0.9):
         timestamp, pos, vel, spin = state
         m, d = self.model, self.data
@@ -107,72 +119,20 @@ class FlightPredictor:
         set_ball(d, self.qadr, self.vadr, pos, vel, spin)
         mujoco.mj_forward(m, d)
         samples = []
-        for step in range(int((now + horizon - timestamp) / m.opt.timestep)):
+        for step in range(0, int((now + horizon - timestamp) / m.opt.timestep), 8):
             absolute = timestamp + d.time
             if step % 8 == 0 and absolute >= now:
                 samples.append((absolute, d.qpos[self.qadr:self.qadr+3].copy(),
                                 d.qvel[self.vadr:self.vadr+3].copy(),
                                 d.qvel[self.vadr+3:self.vadr+6].copy()))
-            mujoco.mj_step(m, d)
+            mujoco.mj_step(m, d, nstep=8)
             if d.qpos[self.qadr] < BASE_POS[0] - 0.20 or d.qpos[self.qadr+2] < 0.5:
                 break
         return samples
 
-    def outgoing(self, position, velocity, spin, paddle_velocity):
-        """Short local contact forecast; no robot rollout and no plant state."""
-        m, d = self.contact_model, self.contact_data
-        mujoco.mj_resetData(m, d)
-        centre = position - N * FACE_CLEAR
-        set_ball(d, self.cq, self.cv, position, velocity, spin)
-        d.qpos[self.pq:self.pq+3] = centre
-        d.qpos[self.pq+3:self.pq+7] = [1, 0, 0, 0]
-        d.qvel[self.pv:self.pv+3] = paddle_velocity
-        mujoco.mj_forward(m, d)
-        touched = False
-        ball_id, face_id = m.geom('ball_geom').id, m.geom('paddle_face').id
-        for step in range(80):
-            d.qpos[self.pq:self.pq+3] = centre + paddle_velocity*d.time
-            d.qpos[self.pq+3:self.pq+7] = [1, 0, 0, 0]
-            d.qvel[self.pv:self.pv+3] = paddle_velocity
-            d.qvel[self.pv+3:self.pv+6] = 0
-            mujoco.mj_step(m, d)
-            touched |= any({c.geom1, c.geom2} == {ball_id, face_id}
-                           for c in d.contact[:d.ncon])
-            if touched and d.qvel[self.cv] > 0 and step > 30:
-                return (d.qpos[self.cq:self.cq+3].copy(),
-                        d.qvel[self.cv:self.cv+3].copy(),
-                        d.qvel[self.cv+3:self.cv+6].copy())
-        return None
-
-    def landing(self, state):
-        m, d = self.model, self.data
-        mujoco.mj_resetData(m, d)
-        set_ball(d, self.qadr, self.vadr, *state)
-        mujoco.mj_forward(m, d)
-        previous_x = state[0][0]
-        net_z = None
-        for _ in range(2200):
-            mujoco.mj_step(m, d)
-            position = d.qpos[self.qadr:self.qadr+3]
-            if previous_x < 0 <= position[0]:
-                net_z = float(position[2])
-            previous_x = position[0]
-            if d.qvel[self.vadr+2] < 0 and position[2] <= TABLE_TOP + BALL_R + 0.002:
-                legal = (net_z is not None and net_z > NET_TOP + BALL_R + 0.012
-                         and 0.06 < position[0] < 1.31 and abs(position[1]) < 0.70)
-                return position[:2].copy(), legal, net_z
-            if position[2] < 0.5:
-                break
-        return None, False, net_z
-
     @staticmethod
     def fast_outgoing(velocity, paddle_velocity):
-        """Fast rigid-face approximation used only to rank online candidates.
-
-        The selected command is still checked once through ``outgoing`` below.
-        This prevents candidate enumeration from consuming the available stroke
-        lead time while retaining MuJoCo contact physics at the decision point.
-        """
+        """Approximate planar-rubber impact; plant outcome is never a filter."""
         normal = N * np.dot(paddle_velocity - velocity, N) * 1.60
         tangent = 0.18 * (paddle_velocity - velocity - np.dot(paddle_velocity - velocity, N) * N)
         return velocity + normal + tangent
@@ -205,7 +165,8 @@ class Quintic:
         c0, c1, c2 = p0, v0*duration, a0*duration**2/2
         rhs = np.array([p1-c0-c1-c2, v1*duration-c1-2*c2,
                         a1*duration**2-2*c2])
-        tail = np.linalg.solve(np.array([[1, 1, 1], [3, 4, 5], [6, 12, 20]]), rhs)
+        aa, bb, cc = rhs
+        tail = np.array([10*aa-4*bb+.5*cc, -15*aa+7*bb-cc, 6*aa-3*bb+.5*cc])
         self.coefficients = np.array([c0, c1, c2, *tail])
 
     def at(self, t):
@@ -256,9 +217,17 @@ def safe_command(model, position, velocity):
     q = kin.ik_safe(position)
     if q is None or position[2] < Z_FLOOR_REL:
         return None
-    jac = kin.jacobian(q)
-    if jac is None:
+    # Differentiate the three forearm sphere constraints analytically.
+    radial = np.asarray(kin._U)
+    elbow = radial*(kin.R_B+kin.L_U*np.cos(q))[:, None]
+    elbow[:, 2] = kin.L_U*np.sin(q)
+    r = position+radial*kin.R_E-elbow
+    derivative = -radial*(kin.L_U*np.sin(q))[:, None]
+    derivative[:, 2] = kin.L_U*np.cos(q)
+    denom = np.sum(r*derivative, axis=1)
+    if np.min(np.abs(denom)) < 1e-8:
         return None
+    jac = r/denom[:, None]
     qdot = jac @ velocity
     gain = -model.actuator_biasprm[0, 2]/model.actuator_gainprm[0, 0]
     command = q+gain*qdot
@@ -269,13 +238,53 @@ def safe_command(model, position, velocity):
     return command
 
 
+def safe_plan(model, plan):
+    """Vectorised check of every 2 ms command, using analytic constraints."""
+    times = np.arange(plan.start, plan.end+.002, .002)
+    p = np.empty((len(times),3)); v = np.empty_like(p)
+    for curve, mask in ((plan.approach, times<plan.ramp_start),
+                        (plan.recovery, times>=plan.stroke_end)):
+        z = np.clip((times[mask]-curve.start)/curve.duration,0,1)
+        c = curve.coefficients
+        p[mask] = sum(z[:,None]**k*c[k] for k in range(6))
+        v[mask] = sum(k*z[:,None]**(k-1)*c[k] for k in range(1,6))/curve.duration
+    for i in np.flatnonzero((times>=plan.ramp_start)&(times<plan.stroke_end)):
+        p[i],v[i],_ = plan.at(times[i])
+    radial = np.asarray(kin._U); tangent = np.asarray(kin._T)
+    a = p @ radial.T + kin.R_E-kin.R_B
+    b = p[:, 2:3]
+    h2 = kin.L_F**2-(p @ tangent.T)**2
+    val = (a*a+b*b+kin.L_U**2-h2)/(2*kin.L_U*np.hypot(a,b))
+    if np.any(h2<=0) or np.any(np.abs(val)>=.9995):
+        return False
+    q = np.arctan2(b,a)+np.arccos(val)
+    if (np.any(q<kin.Q_SAFE_MIN) or np.any(q>kin.Q_SAFE_MAX)
+            or np.any(p[:,2]<Z_FLOOR_REL) or np.any(np.linalg.norm(v,axis=1)>V_PAD_MAX)):
+        return False
+    elbow = radial[None,:,:]*(kin.R_B+kin.L_U*np.cos(q))[:,:,None]
+    elbow[:,:,2] = kin.L_U*np.sin(q)
+    r = p[:,None,:]+radial[None,:,:]*kin.R_E-elbow
+    derivative = -radial[None,:,:]*(kin.L_U*np.sin(q))[:,:,None]
+    derivative[:,:,2] = kin.L_U*np.cos(q)
+    denom = np.sum(r*derivative,axis=2)
+    if np.any(np.abs(denom)<1e-8):
+        return False
+    qdot = np.sum(r*v[:,None,:],axis=2)/denom
+    gain = -model.actuator_biasprm[0,2]/model.actuator_gainprm[0,0]
+    command = q+gain*qdot
+    return bool(np.all(np.abs(qdot)<=QDOT_MAX)
+                and np.all(command>=model.actuator_ctrlrange[:,0])
+                and np.all(command<=model.actuator_ctrlrange[:,1]))
+
+
 class OnlineController:
-    def __init__(self, model, period=0.12):
+    def __init__(self, model, period=0.06):
         self.model = model
         self.period = period
         self.estimator = PositionEstimator()
         self.predictor = FlightPredictor()
         self.plan = None
+        self.pending = None
         self.next_update = 0.0
         self.events = []
         self.activations = []
@@ -292,113 +301,81 @@ class OnlineController:
         self.prediction = [s[1] for s in samples]
         candidates = []
         for t, pos, vel, spin in samples:
-            if t < now+0.14 or vel[0] > -0.3:
+            if t < now+.14 or vel[0] > -.3:
                 continue
             platform = pos-N*FACE_CLEAR-P_OFF-BASE_POS
-            q = kin.ik_safe(platform)
-            if q is None or platform[2] < Z_FLOOR_REL+0.020:
+            if not (-.12 < platform[0] < .10 and .80 < pos[2] < 1.04):
                 continue
-            # A forward return stroke consumes about 30 mm of platform X
-            # travel.  Reserve that room before accepting a static IK point.
-            if platform[0] > -0.005:
-                continue
-            slack = min(np.min(q-kin.Q_SAFE_MIN), np.min(kin.Q_SAFE_MAX-q))
-            if slack < np.deg2rad(8):
-                continue
-            score = slack-.5*abs(platform[2]+.21)-.8*(t-now)
+            score = -abs(pos[0]+.645)
             candidates.append((score, t, pos, vel, spin, platform))
         candidates.sort(key=lambda c: c[0], reverse=True)
-        if not candidates:
-            return None
-        _, t, pos, vel, spin, platform = candidates[0]
-        best = None
-        # Rank candidate strokes with a constant-time collision/flight estimate.
-        # No candidate is executed in the robot plant and no serve is discarded here.
-        for vx, vz in ((.62, .28), (.70, .35), (.78, .32), (.85, .30), (.90, .25)):
-            stroke = np.array([vx, np.clip(-0.5*pos[1], -.10, .10), vz])
-            if np.linalg.norm(stroke) > V_PAD_MAX:
+        # Use the full planar face: its centre stays at a safe height while
+        # interception time and lateral position are selected from observations.
+        # A conservative stroke template avoids the old velocity overshoot.
+        for _, t, pos, vel, spin, platform in candidates:
+            centre_platform = platform.copy()
+            centre_platform[2] = -.217
+            stroke = np.array([.97, np.clip(-.5*pos[1], -.1, .1), .20])
+            plan = StrokePlan(now+COMPUTE_BUDGET, self.commanded_state(now+COMPUTE_BUDGET),
+                              t, centre_platform, stroke)
+            if plan.ramp_start-plan.start < .01 or any(
+                    safe_command(self.model, *plan.at(tt)[:2]) is None
+                    for tt in (plan.ramp_start, t-.01, t, t+.01, plan.stroke_end)):
                 continue
-            v_out = self.predictor.fast_outgoing(vel, stroke)
-            forecast = self.predictor.fast_landing(pos, v_out)
+            if not safe_plan(self.model, plan):
+                continue
+            forecast = self.predictor.fast_landing(pos,
+                self.predictor.fast_outgoing(vel, stroke))
             if forecast is None:
                 continue
             landing, legal, _ = forecast
-            cost = np.linalg.norm(landing-np.array([.38, 0]))+(0 if legal else 2)
-            if best is None or cost < best[0]:
-                best = (cost, stroke, landing, legal)
-        if best is None:
-            return None
-        # One MuJoCo free-paddle contact verifies the selected candidate.  It
-        # has a fixed cost independent of the number of candidate strokes.
-        outgoing = self.predictor.outgoing(pos, vel, spin, best[1])
-        if outgoing is not None:
-            landing, legal, _ = self.predictor.landing(outgoing)
-            if landing is not None:
-                best = (np.linalg.norm(landing-np.array([.38, 0])) + (0 if legal else 2),
-                        best[1], landing, legal)
-        return t, platform, best[1], pos, best[2], best[3]
+            # An approximate prediction is logged, never substituted for the
+            # actual MuJoCo return event evaluation.
+            return t, centre_platform, stroke, pos, landing, legal
+        return None
 
-    def update(self, now, _feedback, contacted=False):
-        if contacted or now < self.next_update:
+    def update(self, now, feedback, contacted=False):
+        if contacted:
+            self.pending = None
             return
-        # Keep a committed stroke.  Replanning before its approach begins can
-        # replace a feasible command with a later, infeasible one.
-        if self.plan is not None:
+        if np.any(feedback < kin.Q_PHYS_MIN) or np.any(feedback > kin.Q_PHYS_MAX):
+            self.events.append(dict(time_s=now, status='encoder-limit', compute_s=0.))
+            return
+        if self.pending is not None and now >= self.pending.start:
+            self.plan = self.pending
+            self.pending = None
+            self.activations.append(float(now))
+        if contacted or now < self.next_update or self.pending is not None:
+            return
+        if self.plan is not None and now >= self.plan.impact-.12:
             return
         self.next_update = now+self.period
+        started = time.perf_counter()
         state = self.estimator.state()
         if state is None:
             return
-        started = time.perf_counter()
         proposal = self.choose(state, now)
-        elapsed = time.perf_counter()-started
         event = dict(time_s=now, observation_time_s=state[0],
-                     observation_age_s=now-state[0], compute_s=elapsed,
-                     status='no-intercept', ready_time_s=None, impact_time_s=None)
+                     observation_age_s=now-state[0], status='no-intercept')
         if proposal is not None:
             impact, platform, velocity, ball, landing, legal = proposal
+            # Fixed publication budget: old plan runs until ready. The measured
+            # estimation + planning + validation cost MUST fit inside it.
+            ready = now+COMPUTE_BUDGET
             event.update(impact_time_s=float(impact), predicted_ball_x_m=float(ball[0]),
-                         predicted_ball_z_m=float(ball[2]), paddle_vx_mps=float(velocity[0]),
-                         paddle_vz_mps=float(velocity[2]),
-                         platform_x_m=float(platform[0]), platform_y_m=float(platform[1]),
-                         platform_z_m=float(platform[2]))
-            # A result cannot affect the plant until its computation has finished.
-            ready = now+elapsed
-            if impact-ready-WINDOW/2-RAMP_T < 0.07:
+                         predicted_ball_z_m=float(ball[2]), predicted_legal=int(legal),
+                         predicted_landing_x_m=float(landing[0]))
+            if impact-ready-WINDOW/2-RAMP_T < 0.01:
                 event['status'] = 'too-late'
             else:
-                start_state = self.commanded_state(ready)
-                plan = StrokePlan(ready, start_state, impact, platform, velocity)
-                checks = [(t, safe_command(self.model, *plan.at(t)[:2]))
-                          for t in np.arange(ready, plan.end+0.002, 0.006)]
-                safe = all(command is not None for _, command in checks)
-                if not safe:
-                    event['unsafe_time_s'] = float(next(t for t, command in checks if command is None))
+                plan = StrokePlan(ready, self.commanded_state(ready), impact, platform, velocity)
+                safe = safe_plan(self.model, plan)
                 elapsed = time.perf_counter()-started
-                ready = now+elapsed
-                # Include command validation in measured latency; rebuild continuity.
-                if safe and impact-ready-WINDOW/2-RAMP_T >= 0.07:
-                    plan = StrokePlan(ready, self.commanded_state(ready), impact,
-                                      platform, velocity)
-                    checks = [(t, safe_command(self.model, *plan.at(t)[:2]))
-                              for t in np.arange(ready, plan.end+0.002, 0.006)]
-                    safe = all(command is not None for _, command in checks)
-                    if not safe:
-                        event['unsafe_time_s'] = float(next(t for t, command in checks if command is None))
-                    final_elapsed = time.perf_counter()-started
-                    # The plan starts at the measured completion time.  It is
-                    # stored now, but StrokePlan.at() holds the current command
-                    # until ``ready``; no command acts before computation ends.
-                    if safe and final_elapsed <= self.period:
-                        self.plan = plan
-                        self.activations.append(float(now+final_elapsed))
-                        event.update(status='scheduled', ready_time_s=now+final_elapsed,
-                                     impact_time_s=impact, predicted_ball_x_m=ball[0],
-                                     predicted_ball_z_m=ball[2], paddle_vx_mps=velocity[0],
-                                     paddle_vz_mps=velocity[2], predicted_legal=int(legal),
-                                     predicted_landing_x_m=landing[0])
-                    else:
-                        event['status'] = 'deadline-miss' if final_elapsed > self.period else 'unsafe-plan'
+                if elapsed > COMPUTE_BUDGET:
+                    event['status'] = 'deadline-miss'
+                elif safe:
+                    self.pending = plan
+                    event.update(status='scheduled', ready_time_s=ready)
                 else:
                     event['status'] = 'unsafe-plan'
         event['compute_s'] = time.perf_counter()-started

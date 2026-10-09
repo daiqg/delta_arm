@@ -11,6 +11,7 @@ import argparse
 import csv
 import json
 import time
+import xml.etree.ElementTree as ET
 from collections import deque
 from pathlib import Path
 
@@ -19,9 +20,9 @@ import numpy as np
 
 import kinematics as kin
 from continuous_hitting_rehearsal import place_launcher
-from online_control import Observation, OnlineController
-from run_hitting import (BALL_R, EVAL_TIMEOUT, HOME_PLAT, NET_TOP, QDOT_MAX,
-                         TABLE_TOP, V_PAD_MAX, HittingSim, set_ball)
+from online_control import Observation, OnlineController, flat_paddle_model, COMPUTE_BUDGET
+from run_hitting import (BASE_POS, BALL_R, EVAL_TIMEOUT, NET_TOP, QDOT_MAX,
+                         V_PAD_MAX, HittingSim, ball_qv, set_ball)
 from trajectory_view import TrajectoryOverlay, sync_trajectory
 
 
@@ -99,16 +100,17 @@ def run_ball(sim, position, velocity, service, ball_number, rng, viewer,
         if now + 1e-9 >= next_sample:
             measured = data.qpos[sim.qadr:sim.qadr+3].copy()
             measured += rng.normal(0.0, measurement_noise, 3)
-            observations.append(Observation(now, now + measurement_delay, measured))
+            observations.append((Observation(now, now + measurement_delay, measured),
+                                 data.qpos[sim.qadr:sim.qadr+3].copy()))
             next_sample += 0.010
-        while observations and observations[0].delivered <= now:
-            observation = observations.popleft()
+        while observations and observations[0][0].delivered <= now:
+            observation, capture_truth = observations.popleft()
             controller.estimator.observe(observation)
             state = controller.estimator.state()
-            if state is not None:
+            if state is not None and not contacted:
                 # Ground truth is used only for an offline estimator metric.
                 error_samples.append(float(np.linalg.norm(
-                    state[1] - data.qpos[sim.qadr:sim.qadr+3])))
+                    state[1] - capture_truth)))
 
         if step % 4 == 0:
             controller.update(now, data.qpos[sim.iface.qadr].copy(), contacted)
@@ -120,7 +122,6 @@ def run_ball(sim, position, velocity, service, ball_number, rng, viewer,
 
         mujoco.mj_step(model, data)
         ball = data.qpos[sim.qadr:sim.qadr+3].copy()
-        ball_velocity = data.qvel[sim.vadr:sim.vadr+3].copy()
         paddle_contact = has_pair(data, sim.gid_ball, sim.gid_face)
         table_contact = has_pair(data, sim.gid_ball, sim.gid_table)
         net_contact = has_pair(data, sim.gid_ball, sim.gid_net)
@@ -156,8 +157,7 @@ def run_ball(sim, position, velocity, service, ball_number, rng, viewer,
                 log['estimate'].append((float(now), state[1].copy()))
             # ``prediction`` is refreshed by OnlineController.choose() only.
             # Do not rerun the ball rollout from this 500 Hz data logger.
-            log['prediction'] = [(float(now), p.copy())
-                                 for p in controller.prediction]
+            log['prediction'] = controller.prediction
             site_velocity = np.zeros(6)
             mujoco.mj_fwdVelocity(model, data)
             mujoco.mj_objectVelocity(model, data, mujoco.mjtObj.mjOBJ_SITE,
@@ -176,6 +176,7 @@ def run_ball(sim, position, velocity, service, ball_number, rng, viewer,
                 break
             # The reference trajectory comes only from the latest online prediction.
             overlay.reference = np.asarray(controller.prediction, dtype=float)
+            overlay._revision += 1
             overlay.append(ball)
             sync_trajectory(viewer, overlay)
             if realtime:
@@ -188,7 +189,7 @@ def run_ball(sim, position, velocity, service, ball_number, rng, viewer,
         if now > EVAL_TIMEOUT:
             break
 
-    bounces = log['serve_bounces'][:2]
+    bounces = log['serve_bounces']
     net_cross = log['serve_net_cross']
     actual_serve_valid = bool(len(bounces) == 2 and net_cross is not None and
         not log['serve_net_contact'] and 0.08 < bounces[0][1][0] < 1.32 and
@@ -242,6 +243,7 @@ def write_outputs(sim, results, out, nballs, seed, measurement_delay,
             serve_net_z_m=net[1][2] if net else None,
             actual_serve_valid=result['actual_serve_valid'],
             paddle_contact=result['paddle_contact'], legal_return=result['legal_return'],
+            return_net_contact=result['return_net_contact'],
             return_net_z_m=ret[1][2] if ret else None,
             return_landing_x_m=landing[0] if landing else None,
             return_landing_y_m=landing[1] if landing else None,
@@ -270,11 +272,15 @@ def write_outputs(sim, results, out, nballs, seed, measurement_delay,
         for result in results:
             for (t, ball), (_, paddle) in zip(result['log']['ball'], result['log']['paddle']):
                 writer.writerow([result['ball'], t, *ball, *paddle])
+    (out / f'{stem}_controller.json').write_text(json.dumps(
+        [dict(ball=r['ball'], events=r['controller_events'],
+              activation_times_s=r['controller_plan_activations']) for r in results], indent=2), encoding='utf-8')
     summary = dict(mode='causal_online_receding_horizon', seed=seed,
                    requested_balls=nballs, simulated_balls=len(results),
                    measurement_delay_s=measurement_delay,
                    measurement_noise_std_m=measurement_noise,
-                   control_period_s=control_period, mujoco_version=mujoco.__version__,
+                   control_period_s=control_period, compute_budget_s=COMPUTE_BUDGET,
+                   paddle_collision_model="planar_elliptical_prism", mujoco_version=mujoco.__version__,
                    legal_serves=sum(r['actual_serve_valid'] for r in results),
                    reachable_serves=sum(r['reachable_by_geometry'] for r in results),
                    paddle_contacts=sum(r['paddle_contact'] for r in results),
@@ -284,6 +290,10 @@ def write_outputs(sim, results, out, nballs, seed, measurement_delay,
                    max_paddle_speed_mps=max((r['actual_peak_paddle_speed_mps'] for r in results), default=0),
                    max_joint_speed_radps=max((r['actual_peak_joint_speed_radps'] for r in results), default=0),
                    min_joint_margin_rad=min((r['actual_min_joint_margin_rad'] for r in results), default=None),
+                   motion_within_limits=sum(r['actual_peak_paddle_speed_mps'] <= V_PAD_MAX
+                       and r['actual_peak_joint_speed_radps'] <= QDOT_MAX
+                       and r['actual_min_joint_margin_rad'] >= kin.Q_MARGIN
+                       and r['controller_command_faults'] == 0 for r in results),
                    notes=['No return trajectory was screened before launch.',
                           'Ground-truth ball velocity is not an online controller input.',
                           'Estimator error is offline evaluation only.'])
@@ -310,7 +320,7 @@ def write_outputs(sim, results, out, nballs, seed, measurement_delay,
 
 def run(nballs=10, headless=False, seed=20261007, realtime=True, output=None,
         auto_close=False, measurement_delay=0.08, measurement_noise_mm=2.0,
-        control_period=0.12):
+        control_period=0.06):
     if nballs < 1:
         raise ValueError('--nballs must be positive')
     if measurement_delay < 0 or measurement_noise_mm < 0 or control_period <= 0:
@@ -322,6 +332,19 @@ def run(nballs=10, headless=False, seed=20261007, realtime=True, output=None,
         except ImportError as exc:
             raise RuntimeError('Activate the mujoco-sim-win environment for the viewer') from exc
     sim = HittingSim()
+    sim.model = mujoco.MjModel.from_xml_string(ET.tostring(flat_paddle_model(), encoding='unicode'),
+        assets={str(p):p.read_bytes() for p in Path('meshes').glob('*.STL')})
+    sim.model.body_pos[sim.model.body('delta_base').id] = BASE_POS
+    sim.data = mujoco.MjData(sim.model)
+    mujoco.mj_setConst(sim.model, sim.data)
+    sim.iface = kin.DeltaMujocoInterface(sim.model, sim.data)
+    sim.qadr, sim.vadr = ball_qv(sim.model)
+    sim.gid_ball = sim.model.geom('ball_geom').id
+    sim.gid_face = sim.model.geom('paddle_face').id
+    sim.gid_table = sim.model.geom('table_top').id
+    sim.gid_net = sim.model.geom('net').id
+    sim.sid_paddle = sim.model.site('paddle_center').id
+    sim.motor_dofs = sim.model.jnt_dofadr[sim.iface.jids]
     rng = np.random.default_rng(seed)
     out = Path(output) if output else Path(__file__).resolve().parent / 'results'
     out.mkdir(parents=True, exist_ok=True)
@@ -340,7 +363,8 @@ def run(nballs=10, headless=False, seed=20261007, realtime=True, output=None,
             position, velocity, service, attempts = sample_legal_reachable_serve(sim, rng)
             place_launcher(sim.model, position)
             print(f'Ball {index+1:02d}/{nballs}: legal launch selected after {attempts} draw(s).', flush=True)
-            result, stopped = run_ball(sim, position, velocity, service, index+1, rng, viewer,
+            observation_rng = np.random.default_rng(np.random.SeedSequence([seed, index, 1]))
+            result, stopped = run_ball(sim, position, velocity, service, index+1, observation_rng, viewer,
                 realtime, measurement_delay, measurement_noise_mm / 1000.0, control_period)
             results.append(result)
             print(f"  contact={bool(result['paddle_contact'])} return={bool(result['legal_return'])} "
@@ -373,7 +397,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path)
     parser.add_argument('--measurement-delay-ms', type=float, default=80.0)
     parser.add_argument('--measurement-noise-mm', type=float, default=2.0)
-    parser.add_argument('--control-period-ms', type=float, default=120.0)
+    parser.add_argument('--control-period-ms', type=float, default=60.0)
     args = parser.parse_args()
     run(args.nballs, args.headless, args.seed, not args.no_realtime, args.output,
         args.auto_close, args.measurement_delay_ms / 1000.0,

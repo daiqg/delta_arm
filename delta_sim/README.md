@@ -2,18 +2,6 @@
 
 本目录是独立的 Delta 机械臂 MuJoCo 仿真模块。长度、质量、时间、速度、力矩分别使用 m、kg、s、m/s、N·m；关节角在代码和 XML 中使用 rad，文档中的角度会标明单位。完整设计与验证记录见[工作总结](../WORK_SUMMARY.md)。
 
-## 在线连续击球
-
-```powershell
-python continuous_hitting.py --nballs 10
-```
-
-默认入口执行因果在线控制，结果为 `results/online_10_balls.csv`、`online_10_trajectories.csv`、`online_10_summary.json` 与 `online_10_final.png`。随机发球只检查规范的两次落台、过网和静态工作空间相交；回球不会在发球前预演筛选。控制器以 80 ms 延迟、2 mm 高斯位置噪声的观测更新状态，按 120 ms 周期重规划；完整 Python 计算时间计入截止判断。可通过 `--measurement-delay-ms`、`--measurement-noise-mm` 和 `--control-period-ms` 修改这些量。
-
-`continuous_hitting_rehearsal.py` 是保留的离线预演基准，不能用于报告在线成功率。
-
-建议先按[快速复现流程](../README.md)完成模型检查、轨迹绘制和连续击球，再查阅本指南中的参数和输出说明。
-
 ## 1. 环境与启动
 
 以下步骤面向 Windows 64 位和 PowerShell。先安装 Git、Miniconda，并确认 `git --version`、`conda --version` 可执行。若 PowerShell 不识别 Conda，在 Miniconda Prompt 中执行 `conda init powershell` 后重开 PowerShell。
@@ -124,53 +112,42 @@ python run_trajectory.py --shape all --cycles 1 --auto-close
 python run_trajectory.py --shape all --headless
 ```
 
-## 4. 连续 10 球可视化
+## 4. 在线连续十球
+
+在安装依赖、激活环境并进入 `delta_sim/` 后执行：
 
 ```powershell
 python continuous_hitting.py --nballs 10
 ```
 
-场景包含标准尺寸球台、球网、发球机外观、40 mm 球及末端刚性安装的球拍。击球场景的 Delta 基座位于 (-0.69, 0, 1.25) m；球拍安装尺寸不变。安装高度来自球拍安全工作空间与第二次落台后球高的交集，实际设备须按可达性重新测量。发球口约在 (1.40, 0, 1.02～1.22) m，球速中心族见 `continuous_hitting.py`；位置和速度有种子可复现的小幅随机变化。
-
-每个候选发球先在 MuJoCo 中确认发球方台面接触、无碰网越网、接球方台面接触，且第二次弹跳后有满足关节安全余量的拍心拦截点。对合格来球，脚本逐一预演若干拍速，要求球拍真实接触后再次越网、无碰网并在对方台面发生接触，才把该球放进可视化 10 球序列。CSV 保留发球初态、两次落台、过网高度、拦截位置、拍速、回球落台和试算次数。这是预先验证可行性的演示，**不能用 10/10 的演示率宣称在线感知与实时控制成功率**。
-
-先在终端完成整组球的筛选，再打开同一窗口连续执行 10 球；每球开始前复位物理状态，相当于发球机依次发出 10 个球。蓝色虚线为预测来球路径，橙色实线为实际球路；每球显示回球落台后的弹起，并让机械臂回位。关闭窗口可提前中止。准备耗时取决于候选试算次数；`Preparing...` 期间未开窗属于正常行为。
-
-轨迹采用平滑接近、20 ms 加速、40 ms 匀速击球、20 ms 减速及 0.5 s 平滑回位，避免原 Hermite 接近段因指定终点高速而出现位置过冲。按 2 ms 检查全程安全 IK、球拍最低点离台至少 10 mm、含速度前馈的伺服指令范围、拍速 ≤1.2 m/s 与关节速度 ≤20 rad/s；完整预演另验证实际峰值速度及关节物理限位至少 2° 余量。上述速度上限是当前仿真设计值，实机需按驱动器规格设定。
-
-这里只复现发球机出球后的单打球路规则：先落发球方、越网、再落接球方，接球方一次落台后击球并直接落到对方台面。采用更严格的无碰网和台内余量筛选，不模拟人的手掌、16 cm 抛球及裁判判罚；也不作为双打斜线发球演示。空气密度 1.2 kg/m³、黏度 1.8e-5 Pa·s；球使用 MuJoCo 椭球气动模型，`fluidcoef="0.175 0.0875 0.525 0.35 0.35"`。这些系数及胶皮、台面接触参数是待实测标定的近似值，不应将其视为已完成 sim2real 标定。
-
-| 选项 | 默认值 / 作用 |
-| --- | --- |
-| `--nballs 10` | 请求球数，建议使用正整数 |
-| `--seed 20261007` | 随机种子，控制发球族选择及小幅位置/速度变化 |
-| `--headless` | 不打开窗口 |
-| `--no-realtime` | 取消演示中的等待，适合批量运行；不保证严格实时 |
-| `--auto-close` | 结束后自动关闭 viewer |
-| `--output results/my_run` | 自定义输出目录，避免覆盖先前结果 |
-
-运行结束后先写入本轮汇总、CSV 和最终截图，再保留最后一帧；可用 `--auto-close` 自动关窗。提前关窗会停止后续球，保存已经执行的记录，汇总中的实际球数可能小于请求球数。
+默认打开 MuJoCo 窗口：蓝色为最近一次在线预测，橙色为实际球路。每球复位后重新发球；结束后保留窗口，关闭窗口退出。加 `--auto-close` 可自动关闭。
 
 ```powershell
 python continuous_hitting.py --nballs 10 --headless --no-realtime --output results/my_run
-Get-Content results\my_run\random_10_summary.json
+Get-Content results/my_run/online_10_summary.json
+python verify_online_control.py
 ```
 
-汇总应检查：
+发球只按双方落台、过网及工作空间相交筛选，**不会试打或预先筛选回球**。控制器只接收已送达位置观测，初态真值、真值球速和未来球路不进入控制器。发球范围保持旧在线版的小幅随机族，不扩大或缩小范围来调整本轮成功率；该范围并不代表任意随机来球。
 
-| 字段 | 含义 |
+| 参数 | 设置 |
 | --- | --- |
-| `requested_balls` | 请求球数 |
-| `simulated_balls` | 返回结果的试验数，可能包含关窗中止的试验 |
-| `legal_serves` | 发球双方台面接触且无碰网过网的球数 |
-| `reachable_serves` | 第二次弹跳后存在安全 IK 拦截点的球数 |
-| `paddle_contacts` | 检测到球拍面接触的球数 |
-| `legal_returns` | 击球后过网、无碰网且接触对方台面的球数 |
-| `motion_within_limits` | 全程规划与实际速度、关节余量均合格的球数 |
-| `target_hits_100mm` | 合法回球且落点距 (0.58, 0) m 小于 100 mm 的球数 |
-| `preview_attempts` | 为选出该序列所做的完整 MuJoCo 击球试算总数 |
+| 位置采样 | 100 Hz |
+| 观测延迟 / 噪声 | 80 ms / 2 mm 标准差高斯噪声 |
+| 规划检查间隔 | 60 ms；已有待发布计划时不重复启动 |
+| 计算预算 | 100 ms，包括状态估计、预测和全轨迹安全检查；超时丢弃 |
+| 计划生效 | 开始计算后的 100 ms；此前继续旧轨迹，因此实际重规划间隔可能超过 60 ms |
+| 物理积分 / 伺服 | 2 kHz / 500 Hz |
+| 挥拍 | 30 ms 加速、40 ms 击球窗口、30 ms 减速、0.5 s 回位 |
+| 拦截策略 | 由实时预测选时间和横向位置；拦截平台高度 -217 mm |
+| 挥拍速度模板 | (0.97, 横向修正, 0.20) m/s；这是保守模板，不是每球全局最优拍速搜索 |
+| 实测限制 | 拍速 ≤1.2 m/s，关节速度 ≤20 rad/s，物理关节限位余量 ≥2° |
 
-即使指定其他球数，输出文件名仍为 `random_10_*`，应以 JSON 内的实际计数为准。不同 MuJoCo 版本的接触结果可能不同；脚本在找不到可行回球时会明确报错，而不会把漏接算成合法回球。
+可用 `--seed`、`--measurement-delay-ms`、`--measurement-noise-mm` 和 `--control-period-ms` 修改实验设置。`--no-realtime` 只取消显示等待，不取消计算预算检查。
+
+`online_<n>_summary.json` 汇总合法发球、接触、严格回球、规划超时和运动约束；`online_<n>_balls.csv` 保存逐球指标，`online_<n>_trajectories.csv` 保存球与拍心轨迹，`online_<n>_controller.json` 保存每次规划的观测年龄、耗时、候选状态及发布时间，`online_<n>_final.png` 保存最终场景。逐球估计 RMSE 使用同一采集时刻的真值，仅供评估。
+
+旧预演版保持不变：`python continuous_hitting_rehearsal.py --nballs 10`，输出仍为 `random_10_*`。它的回球经过离线筛选，不能当作在线性能。
 
 ## 5. 结果文件
 
@@ -183,10 +160,10 @@ Get-Content results\my_run\random_10_summary.json
 | `traj_<shape>_mujoco.png` | 实际 MuJoCo 场景及轨迹叠加截图 |
 | `traj_<shape>.csv` | 时间、期望/实际 XYZ、三维误差 |
 | `traj_<shape>_metrics.json` | 全程 RMS、最大误差、Z 误差、闭环残差、力矩峰值及完成状态 |
-| `random_10_balls.csv` | 随机发球、拦截、回球的逐球 SI 数据及合法性结果 |
-| `random_10_trajectories.csv` | 2 ms 采样的球位置与拍心世界坐标轨迹 |
-| `random_10_summary.json` | 连续随机击球汇总与预演次数 |
-| `random_10_final.png` | 最终 MuJoCo 帧，离屏渲染成功时保存 |
+| `online_<n>_balls.csv` | 随机发球、拦截、回球的逐球 SI 数据及合法性结果 |
+| `online_<n>_trajectories.csv` | 2 ms 采样的球位置与拍心世界坐标轨迹 |
+| `online_<n>_summary.json` | 连续随机击球汇总与预演次数 |
+| `online_<n>_final.png` | 最终 MuJoCo 帧，离屏渲染成功时保存 |
 
 轨迹 CSV 的 XYZ 坐标相对基座；击球落点相对球台世界坐标系。CSV 和 JSON 长度单位均为米，图表会标注 mm 或 cm；不能直接混合两种坐标系。
 
