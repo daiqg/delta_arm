@@ -325,7 +325,7 @@ def run(nballs=10, headless=False, seed=20261007, realtime=True, output=None,
     rng = np.random.default_rng(seed)
     out = Path(output) if output else Path(__file__).resolve().parent / 'results'
     out.mkdir(parents=True, exist_ok=True)
-    if viewer is not None:
+    if not headless:
         viewer = mj_viewer.launch_passive(sim.model, sim.data)
         viewer.cam.type = mujoco.mjtCamera.mjCAMERA_FREE
         viewer.cam.lookat[:] = (0.0, 0.0, 0.85)
