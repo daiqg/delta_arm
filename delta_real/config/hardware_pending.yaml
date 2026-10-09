@@ -1,0 +1,78 @@
+# Research worksheet only. Not a ROS parameter file or executable driver config.
+schema_version: 1
+status: documentation_only
+hardware_enable_allowed: false
+source:
+  model_in_manual: DM-J4310-2ECV1.1
+  document_revision: V1.0
+  document_date: '2023-11-16'
+  pdf_sha256: AAD2C3AE95932393C87B4D149A4009C8E93AF727DF8D787472DE807E2703D68E
+nameplate_specifications:
+  nominal_voltage_v: 24
+  rated_current_a: 2.5
+  peak_current_a: 7.5
+  current_definition: null
+  rated_torque_nm: 3
+  peak_torque_nm: 7
+  allowed_peak_duration_s: null
+  rated_speed_rpm: 120
+  no_load_max_speed_rpm: 200
+  internal_reduction_ratio: 10
+  encoder_bits: 14
+  encoder_count: 2
+  mass_kg_approx: 0.3
+  diameter_table_mm: 56
+  diameter_drawing_mm: 57
+  height_mm: 46
+communication:
+  can_bitrate_bps: 1000000
+  can_frame_type: standard
+  uart_baudrate_bps: 921600
+  adapter_model: null
+  transport: null  # Native SocketCAN or MCU bridge, to be selected.
+  firmware_version: null
+  full_protocol_revision: null
+  position_reference: null
+  velocity_reference: null
+  torque_reference: null
+  feedback_id_layout_confirmed: false
+  quantization_mapping_confirmed: false
+  enable_disable_protocol_confirmed: false
+  p_max: null
+  v_max: null
+  t_max: null
+  feedback_period_s: null
+  drive_watchdog_s: null
+mechanics:
+  cad_revision: null
+  robot_geometry: null
+  joint_names: [motor_arm_joint1, motor_arm_joint2, motor_arm_joint3]
+  joints:
+    motor_arm_joint1: {serial_number: null, can_id: null, master_id: null, direction: null, zero_rad: null, external_ratio: null}
+    motor_arm_joint2: {serial_number: null, can_id: null, master_id: null, direction: null, zero_rad: null, external_ratio: null}
+    motor_arm_joint3: {serial_number: null, can_id: null, master_id: null, direction: null, zero_rad: null, external_ratio: null}
+  joint_limits_rad: null
+  continuous_torque_limits_nm: null
+  peak_torque_limits_nm: null
+  velocity_limits_rad_s: null
+  acceleration_limits_rad_s2: null
+  jerk_limits_rad_s3: null
+  stop_distance_envelope: null
+electrical:
+  schematic_revision: null
+  termination_and_grounding_verified: false
+  emergency_stop_chain_verified: false
+  gravity_load_support_verified: false
+  regeneration_handling: null
+  supply_and_wiring_limits: null
+ros2_plan:
+  proposed_os: Ubuntu 24.04 LTS
+  proposed_distribution: Jazzy
+  hardware_interface: ros2_control_SystemInterface
+  control_rate_hz_candidate: 500
+  rate_validated: false
+  actual_control_mode: null
+  host_watchdog_s: null
+  max_feedback_age_s: null
+  max_joint_feedback_skew_s: null
+  camera_time_sync_method: null
