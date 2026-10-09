@@ -33,7 +33,6 @@ conda env update -n mujoco-sim-win -f environment_win.yml
 conda activate mujoco-sim-win
 ```
 
-`requirements.txt` 包含相同的三个仿真库及版本约束，供已有 Python 3.11 环境用 `python -m pip install -r requirements.txt` 安装。Windows 的推荐安装流程以上述 YAML 为准。更新已有环境不会主动移除原有的其他包。版本变化可能影响碰撞落点，比较实验时应记录实际依赖版本。
 
 不使用终端激活时，可以在本目录用以下命令替代对应的运行命令：
 
@@ -144,7 +143,6 @@ Get-Content results/my_run/online_10_summary.json
 
 `online_<n>_summary.json` 汇总合法发球、接触、严格回球、规划超时和运动约束；`online_<n>_balls.csv` 保存逐球指标，`online_<n>_trajectories.csv` 保存球与拍心轨迹，`online_<n>_controller.json` 保存每次规划的观测年龄、耗时、候选状态及发布时间，`online_<n>_final.png` 保存最终场景。逐球估计 RMSE 使用同一采集时刻的真值，仅供评估。
 
-旧预演版保持不变：`python continuous_hitting_rehearsal.py --nballs 10`，输出仍为 `random_10_*`。它的回球经过离线筛选，不能当作在线性能。
 
 ## 5. 结果文件
 

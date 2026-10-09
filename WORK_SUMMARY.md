@@ -21,11 +21,11 @@
 | `kinematics.py` | FK、IK、安全限位、雅可比和 MuJoCo 接口 |
 | `run_trajectory.py` | 五种轨迹、动态可视化和原始误差记录 |
 | `run_hitting.py` | 共享击球核心：来球预测、拦截、运动规划、碰撞及结果判定 |
-| `continuous_hitting.py` | 随机合规来球筛选、候选回球预演、连续播放与数据导出 |
+| `continuous_hitting.py`、`online_control.py` | 随机合规来球筛选、在线估计与规划、连续播放和数据导出 |
 | `trajectory_view.py` | MuJoCo 场景中的期望与实际路径叠加 |
 | `preview_model.py` | 静态模型预览与截图 |
-| `environment_win.yml`、`requirements.txt` | 安装依赖；MuJoCo 固定为 3.6.0 |
-| `results/` | 当前模型截图、五形状数据和随机 10 球结果 |
+| `environment_win.yml` | 统一的环境及运行依赖清单 |
+| `results/` | 模型截图、五形状数据及在线 30 球参考结果 |
 
 机械臂由三根上臂、六根前臂及平台组成，三主动转动关节驱动，前臂末端用 connect 约束闭合。35 份 STL 组成 36 个 mesh geom，其中一份连杆资源复用；必须显式设置 `type="mesh"`，否则 MuJoCo 可能把网格拟合成默认球体。球拍是平台下无独立关节的子 body，随平台刚性运动。
 

@@ -17,7 +17,7 @@ from run_hitting import (BASE_POS, BALL_R, FACE_CLEAR, HOME_PLAT, N, NET_TOP,
                         V_PAD_MAX, WINDOW, Z_FLOOR_REL, ball_qv, set_ball)
 
 
-# Online stroke settings; the preserved rehearsal uses its original ramp.
+# Online stroke settings.
 RAMP_T = .03
 COMPUTE_BUDGET = .10
 

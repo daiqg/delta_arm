@@ -19,7 +19,6 @@ import mujoco
 import numpy as np
 
 import kinematics as kin
-from continuous_hitting_rehearsal import place_launcher
 from online_control import Observation, OnlineController, flat_paddle_model, COMPUTE_BUDGET
 from run_hitting import (BASE_POS, BALL_R, EVAL_TIMEOUT, NET_TOP, QDOT_MAX,
                          V_PAD_MAX, HittingSim, ball_qv, set_ball)
@@ -30,6 +29,18 @@ from trajectory_view import TrajectoryOverlay, sync_trajectory
 # and controller lead-time budget, not from a return pre-rollout.  The launch
 # pose and all three velocity components remain random for each ball.
 ONLINE_SERVE_FAMILIES = ((1.02, -3.4, -2.0),)
+
+
+def place_launcher(model, pos):
+    """Align launcher visuals with the sampled release position."""
+    for name in ('launcher_body', 'launcher_barrel'):
+        geom = model.geom(name)
+        model.geom_pos[geom.id, 1] = pos[1]
+        model.geom_pos[geom.id, 2] = pos[2]
+    post = model.geom('launcher_post').id
+    model.geom_pos[post, 1] = pos[1]
+    model.geom_pos[post, 2] = pos[2] / 2
+    model.geom_size[post, 1] = pos[2] / 2
 
 
 def sample_legal_reachable_serve(sim, rng, max_attempts=300):

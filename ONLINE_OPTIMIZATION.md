@@ -43,7 +43,6 @@ Get-Content results/my_run/online_10_summary.json
 
 `online_<n>_summary.json` 汇总合法发球、接触、严格回球、规划超时和运动约束；`online_<n>_balls.csv` 保存逐球指标，`online_<n>_trajectories.csv` 保存球与拍心轨迹，`online_<n>_controller.json` 保存每次规划的观测年龄、耗时、候选状态及发布时间，`online_<n>_final.png` 保存最终场景。逐球估计 RMSE 使用同一采集时刻的真值，仅供评估。
 
-旧预演版保持不变：`python continuous_hitting_rehearsal.py --nballs 10`，输出仍为 `random_10_*`。它的回球经过离线筛选，不能当作在线性能。
 <!-- guide-end -->
 
 ## 改动与原因
@@ -65,7 +64,6 @@ Get-Content results/my_run/online_10_summary.json
 | 20261010 | 9/10 | 10/10 | 1.1520 | 9.1148 | 0.1475 |
 | 20261011 | 9/10 | 10/10 | 1.1650 | 9.1757 | 0.1401 |
 
-全部三十球发球合法、几何可达且发生拍面接触；这三组最终测试没有规划超时。摘要数据见 [online_validation.json](online_validation.json)。默认种子的可视化十球与无窗口结果一致。自动校验覆盖解析/数值雅可比对照、安全检查一致性、禁止提前发布、接触取消待发布计划，以及平面拍板尺寸。
 
 曾有更高指令拍速版本得到一组 10/10，但出现 1.222 m/s 的实测超速，未作为最终配置。保留限制后仍有碰网/未落对方台面的失败，不能称为实现了 100%。
 
