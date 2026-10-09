@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- scene_pingpong.xml — Delta 机械臂 + 乒乓球拍 击球仿真场景
      机器人(含球拍)经 <include> 引入 delta_robot_paddle.xml (由 delta_robot.xml 自动生成);
-     基座世界安装位置由 Python 设置 (默认 -0.75 0 1.20)。
+     基座世界安装位置由 Python 设置 (-0.69 0 1.25)。
 
 世界坐标 = 标准乒乓球台坐标 (单位: 米):
   台面: 2.74 x 1.525, 顶面 z = 0.76, 台面中心 (0,0)
   球网: x = 0, 高 0.1525 (顶 0.9125), 宽 1.83
-  发球机: 台端外 (1.60, 0, 1.02), 平射发球
+  发球机: 台端外，发球口在 x=1.40，出球高度逐球调整
   球:   40mm / 2.7g, 流体阻力 (空气 density 1.2, viscosity 1.8e-5)
 -->
 <mujoco model="delta_pingpong">
   <compiler angle="radian" coordinate="local" inertiafromgeom="auto" meshdir="meshes" />
   <option timestep="0.0005" gravity="0 0 -9.81" integrator="implicitfast"
-          density="0.42" viscosity="1.8e-5"
+          density="1.2" viscosity="1.8e-5"
           iterations="100" ls_iterations="50" />
 
   <visual>
@@ -62,15 +62,15 @@
           material="mat_launcher" contype="0" conaffinity="0" />
 
     <!-- ===== 机器人安装龙门 (视觉模型) ===== -->
-    <geom name="gantry_beam" type="box" pos="-1.09 0 1.695" size="0.42 0.035 0.035"
+    <geom name="gantry_beam" type="box" pos="-1.09 0 1.295" size="0.42 0.035 0.035"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
-    <geom name="gantry_post" type="box" pos="-1.49 0 0.8475" size="0.035 0.035 0.8475"
+    <geom name="gantry_post" type="box" pos="-1.49 0 0.6475" size="0.035 0.035 0.6475"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
-    <geom name="gantry_post2" type="box" pos="-1.49 0.35 0.8475" size="0.035 0.035 0.8475"
+    <geom name="gantry_post2" type="box" pos="-1.49 0.35 0.6475" size="0.035 0.035 0.6475"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
-    <geom name="gantry_post3" type="box" pos="-1.49 -0.35 0.8475" size="0.035 0.035 0.8475"
+    <geom name="gantry_post3" type="box" pos="-1.49 -0.35 0.6475" size="0.035 0.035 0.6475"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
-    <geom name="gantry_beam2" type="box" pos="-1.49 0 1.695" size="0.035 0.385 0.035"
+    <geom name="gantry_beam2" type="box" pos="-1.49 0 1.295" size="0.035 0.385 0.035"
           rgba="0.32 0.34 0.38 1" contype="0" conaffinity="0" />
 
     <!-- ===== 乒乓球 (40mm / 2.7g, 空气阻力) ===== -->
@@ -78,7 +78,8 @@
       <freejoint name="ball_joint" />
       <inertial pos="0 0 0" mass="0.0027" diaginertia="4.32e-7 4.32e-7 4.32e-7" />
       <geom name="ball_geom" type="sphere" size="0.02" mass="0.0027" rgba="1 0.93 0.93 1"
-            fluidshape="ellipsoid" contype="1" conaffinity="1" condim="3"
+            fluidshape="ellipsoid" fluidcoef="0.175 0.0875 0.525 0.35 0.35"
+            contype="1" conaffinity="1" condim="3"
             friction="0.6 0.005 0.0001" solref="0.003 0.3" solimp="0.9 0.95 0.001" margin="0.0005" />
       <site name="ball_center" pos="0 0 0" size="0.003" rgba="1 0.25 0.25 1" />
     </body>

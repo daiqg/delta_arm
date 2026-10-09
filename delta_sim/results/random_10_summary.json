@@ -1,0 +1,15 @@
+{
+  "seed": 20261007,
+  "requested_balls": 10,
+  "simulated_balls": 10,
+  "preview_attempts": 85,
+  "legal_serves": 10,
+  "reachable_serves": 10,
+  "paddle_contacts": 10,
+  "legal_returns": 10,
+  "target_hits_100mm": 0,
+  "mujoco_version": "3.6.0",
+  "paddle_speed_limit_mps": 1.2,
+  "joint_speed_limit_radps": 20.0,
+  "motion_within_limits": 10
+}

@@ -1,33 +1,8 @@
+"""Shared MuJoCo Delta paddle simulation, planning and contact checks.
+
+Run continuous_hitting.py for the constrained random serve demonstration.
 """
-run_hitting.py — Delta 机械臂 + 乒乓球拍 击球仿真 (v3, 预演式求解)
-====================================================================
-场景: 标准球台 (2.74x1.525x0.76m) + 球网, 发球机在台端外发球,
-      Delta 机械臂吊装在己方台端上方, 球拍从动平台中心竖直向下刚性固定。
-
-击球几何 (与真实接攻球一致):
-  发球 -> 发球方台面弹跳 -> 过网 -> 接球方台面弹跳 -> 球升至顶点后下落
-  -> 机械臂在台面上方以下落姿态拦截来球 (拍面法线与来球近共线)
-  -> 反弹 + 挥拍前送 -> 球过网落在对方台面目标落点
-
-核心设计 —— 预演式击球求解 (rehearsal solver):
-  1. 发球机随机发球; 感知延迟 80ms 后用预测模型 (机器人移至远处) 前向仿真
-     来球轨迹 (含自旋), 得到全弹道样本。
-  2. 在可达窗口内选拦截点 (解析 IK + 关节余量 + 拍面迎球)。
-  3. 击球求解: 对每个候选拍速 v_pad (s·N + c·T1 + p·T2 网格):
-     在专用评估模型中"预演"完整击球 —— 机器人从待机位按真实轨迹规划
-     (Hermite 接近 -> 恒速过窗 -> 回位) 挥拍, 球带真实速度+自旋飞来,
-     一直仿真到球落台。预演与正式试验物理完全一致 (同模型同控制),
-     预测落点 = 实际落点 (确定性系统), 从根本上消除碰撞简化模型误差
-     (台面弹跳赋予的球自旋无法用 e/lambda 线性模型描述)。
-  4. 真空弹道 + 线性碰撞模型只作粗筛; 山式细化搜索最小落点误差。
-  5. 正式执行: 位置伺服 + 解析 IK + 速度前馈, 拍心精确扫过触球点。
-  6. 自适应偏差修正吸收残余系统误差 (数值级别, 仅微调)。
-
-用法:
-  python run_hitting.py                 # 20 次试验
-  python run_hitting.py --n 50
-"""
-import os, sys, time, math, argparse
+import os, sys, time, math
 import numpy as np
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -35,13 +10,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mujoco
 import kinematics as kin
 import make_paddle_robot
-
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+from trajectory_view import TrajectoryOverlay, sync_trajectory
 
 # ---------------- 场景常量 ----------------
-BASE_POS     = np.array([-0.69, 0.0, 1.65])     # 使竖直拍面拦截来球上升段
+BASE_POS     = np.array([-0.69, 0.0, 1.25])     # 使竖直拍面拦截规范发球的第二次弹跳
 N            = np.array(make_paddle_robot.PADDLE_NORMAL)
 T1           = np.array([-N[2], 0.0, N[0]])     # 拍面切向 (竖直面内, 下前方向)
 T2           = np.array([0.0, 1.0, 0.0])        # 拍面切向 (水平横向)
@@ -52,13 +24,12 @@ Z_FLOOR_REL  = 0.76 + 0.010 - BASE_POS[2] - make_paddle_robot.PADDLE_BOTTOM_OFFS
 
 LAUNCH_POS   = np.array([1.40, 0.0, 1.02])      # 发球机出球口
 LAUNCH_V     = np.array([-6.5, 0.0, -1.0])      # 固定演示来球速度
-TARGETS      = [(0.45, 0.0), (0.58, 0.18), (0.58, -0.18),
-                (0.32, 0.0), (0.68, 0.0)]       # 目标落点 (对方台面)
 TARGET_R     = 0.10                             # 成功半径 [m]
 
 PERCEPT_DELAY = 0.08        # 感知+规划延迟 [s]
 WINDOW        = 0.04        # 恒速过窗时长 (±20ms; 关节行程 |v|·W·J ≈ 35° 需在量程内)
 RECOVER_T     = 0.50        # 回位时间
+RAMP_T        = 0.020       # Local acceleration/deceleration around the stroke
 V_PAD_MAX     = 1.2         # 拍速上限 [m/s] (挥拍关节行程受电机量程 60° 限制)
 QDOT_MAX      = 20.0        # 关节速度上限 [rad/s]
 EVAL_TIMEOUT  = 3.2         # 单次试验评估超时
@@ -102,22 +73,6 @@ def set_ball(data, qadr, vadr, pos, vel, spin=(0, 0, 0)):
     data.qvel[vadr+3:vadr+6] = spin
 
 
-def hermite(t, T, p0, v0, p1, v1):
-    """三次 Hermite: 返回 (p, v)"""
-    s = min(max(t / T, 0.0), 1.0)
-    h00 = 2*s**3 - 3*s**2 + 1
-    h10 = s**3 - 2*s**2 + s
-    h01 = -2*s**3 + 3*s**2
-    h11 = s**3 - s**2
-    dh00 = (6*s**2 - 6*s) / T
-    dh10 = (3*s**2 - 4*s + 1) / T
-    dh01 = (-6*s**2 + 6*s) / T
-    dh11 = (3*s**2 - 2*s) / T
-    p = h00*p0 + h10*T*v0 + h01*p1 + h11*T*v1
-    v = dh00*p0 + dh10*T*v0 + dh01*p1 + dh11*T*v1
-    return p, v
-
-
 class HittingSim:
     def __init__(self):
         (self.model, self.data, self.pmodel, self.pdata,
@@ -131,7 +86,10 @@ class HittingSim:
         self.kv = -self.model.actuator_biasprm[0, 2]
         self.gid_ball = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, "ball_geom")
         self.gid_face = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, "paddle_face")
+        self.gid_table = self.model.geom('table_top').id
+        self.gid_net = self.model.geom('net').id
         self.sid_paddle = self.model.site('paddle_center').id
+        self.motor_dofs = self.model.jnt_dofadr[self.iface.jids]
         self.bias = np.zeros(2)          # 自适应落点偏差
         self.e, self.lam = 0.60, 0.15    # 碰撞近似模型参数 (粗筛用, 标定后更新)
         self.q_home = kin.ik_safe(HOME_PLAT)
@@ -161,6 +119,51 @@ class HittingSim:
                 break
         return samples
 
+    def inspect_serve(self, pos, vel, t_horizon=1.8):
+        """Validate the two table bounces and net crossing in MuJoCo."""
+        m, d = self.pmodel, self.pdata
+        mujoco.mj_resetData(m, d)
+        set_ball(d, self.pqadr, self.pvadr, pos, vel)
+        mujoco.mj_forward(m, d)
+        samples = []
+        bounces = []
+        net_cross = None
+        net_contact = False
+        prev_x = pos[0]
+        touching_table = False
+        for step in range(int(t_horizon / m.opt.timestep)):
+            if step % 4 == 0:
+                samples.append((d.time, d.qpos[self.pqadr:self.pqadr+3].copy(),
+                                d.qvel[self.pvadr:self.pvadr+3].copy(),
+                                d.qvel[self.pvadr+3:self.pvadr+6].copy()))
+            mujoco.mj_step(m, d)
+            p = d.qpos[self.pqadr:self.pqadr+3]
+            table_now = False
+            for c in range(d.ncon):
+                pair = {d.contact[c].geom1, d.contact[c].geom2}
+                if pair == {self.gid_ball, self.gid_table}:
+                    table_now = True
+                if pair == {self.gid_ball, self.gid_net}:
+                    net_contact = True
+            if table_now and not touching_table:
+                bounces.append((float(d.time), p.copy()))
+            touching_table = table_now
+            if prev_x > 0 >= p[0] and net_cross is None:
+                net_cross = (float(d.time), p.copy())
+            prev_x = p[0]
+            if len(bounces) >= 2 and p[0] < BASE_POS[0] - 0.15:
+                break
+            if p[2] < 0.5:
+                break
+        service = (len(bounces) >= 2 and net_cross is not None and not net_contact
+                   and 0.08 < bounces[0][1][0] < 1.32
+                   and -1.32 < bounces[1][1][0] < -0.08
+                   and all(abs(b[1][1]) < 0.70 for b in bounces[:2])
+                   and bounces[0][0] < net_cross[0] < bounces[1][0]
+                   and net_cross[1][2] > NET_TOP + BALL_R + 0.015)
+        return samples, dict(valid=bool(service), bounces=bounces[:2],
+                             net_cross=net_cross, net_contact=net_contact)
+
     # ---------- 拦截点选择 ----------
     def choose_intercept(self, samples, t_now_min):
         """返回 (score, t, ball_pos, ball_vel, plat_t[基座系], q, slack) 或 None"""
@@ -171,6 +174,8 @@ class HittingSim:
             if vel @ N > -0.3:               # 必须迎着拍面来
                 continue
             plat_t = pos - N * FACE_CLEAR - P_OFF - BASE_POS   # 基座系
+            if plat_t[2] < Z_FLOOR_REL + 0.020:
+                continue
             q = kin.ik_safe(plat_t)
             if q is None:
                 continue
@@ -189,23 +194,68 @@ class HittingSim:
         p_home = HOME_PLAT
         t_start = PERCEPT_DELAY
         t_A_end = t_imp_rel - WINDOW / 2      # 接近段结束
-        T_A = t_A_end - t_start
         p_A = plat_t - v_pad * (WINDOW / 2)
         t_B_end = t_A_end + WINDOW
         p_B = plat_t + v_pad * (WINDOW / 2)
-        T_R = RECOVER_T
+        t_ramp = t_A_end - RAMP_T
+        p_ready = p_A - v_pad * RAMP_T / 2
+        p_stop = p_B + v_pad * RAMP_T / 2
+
+        def smooth_move(t, duration, start, end):
+            s = np.clip(t / duration, 0.0, 1.0)
+            h = 10*s**3 - 15*s**4 + 6*s**5
+            dh = (30*s**2 - 60*s**3 + 30*s**4) / duration
+            return start + h*(end-start), dh*(end-start)
 
         def plan(τ):
             if τ < t_start:
                 return p_home, np.zeros(3)
+            if τ < t_ramp:
+                return smooth_move(τ-t_start, t_ramp-t_start, p_home, p_ready)
             if τ < t_A_end:
-                return hermite(τ - t_start, T_A, p_home, np.zeros(3), p_A, v_pad)
+                s = (τ-t_ramp) / RAMP_T
+                h = 3*s*s - 2*s**3
+                integral = s**3 - 0.5*s**4
+                return p_ready + v_pad*RAMP_T*integral, v_pad*h
             if τ < t_B_end:
                 return plat_t + v_pad * (τ - t_imp_rel), v_pad
-            if τ < t_B_end + T_R:
-                return hermite(τ - t_B_end, T_R, p_B, v_pad, p_home, np.zeros(3))
+            if τ < t_B_end + RAMP_T:
+                s = (τ-t_B_end) / RAMP_T
+                h = 3*s*s - 2*s**3
+                integral = s - s**3 + 0.5*s**4
+                return p_B + v_pad*RAMP_T*integral, v_pad*(1-h)
+            if τ < t_B_end + RAMP_T + RECOVER_T:
+                return smooth_move(τ-t_B_end-RAMP_T, RECOVER_T, p_stop, p_home)
             return p_home, np.zeros(3)
         return plan
+
+    def inspect_plan(self, plat_t, v_pad, t_imp_rel):
+        """Check the entire 500 Hz command sequence, including feed-forward."""
+        plan = self.make_plan(plat_t, v_pad, t_imp_rel)
+        peak_v = peak_qdot = 0.0
+        min_margin = float('inf')
+        duration = t_imp_rel + WINDOW/2 + RAMP_T + RECOVER_T
+        for t in np.arange(0.0, duration + 0.002, 0.002):
+            p, v = plan(t)
+            q = kin.ik_safe(p)
+            if q is None or p[2] < Z_FLOOR_REL:
+                return dict(valid=False, reason='workspace-or-table')
+            jac = kin.jacobian(q)
+            if jac is None:
+                return dict(valid=False, reason='singular')
+            qdot = jac @ v
+            command = q + (self.kv / self.kp)*qdot
+            peak_v = max(peak_v, float(np.linalg.norm(v)))
+            peak_qdot = max(peak_qdot, float(np.max(np.abs(qdot))))
+            min_margin = min(min_margin, float(np.min(q-kin.Q_PHYS_MIN)),
+                             float(np.min(kin.Q_PHYS_MAX-q)))
+            if (peak_v > V_PAD_MAX + 1e-9 or peak_qdot > QDOT_MAX or
+                    np.any(command < self.model.actuator_ctrlrange[:, 0]) or
+                    np.any(command > self.model.actuator_ctrlrange[:, 1])):
+                return dict(valid=False, reason='speed-or-command-limit')
+        return dict(valid=True, peak_paddle_speed_mps=peak_v,
+                    peak_joint_speed_radps=peak_qdot,
+                    min_joint_margin_rad=min_margin)
 
     def servo_ctrl(self, model, data, plan, τ):
         """位置伺服 + 速度前馈 (向 data.ctrl 写入)"""
@@ -391,7 +441,8 @@ class HittingSim:
 
     # ---------- 单次试验 ----------
     def run_trial(self, seed, target, record=True, viewer=None, realtime=False,
-                  v_pad_override=None, launch_jitter=1.0):
+                  v_pad_override=None, launch_jitter=1.0, launch=None,
+                  incoming=None, service=None, finish_recovery=False):
         rng = np.random.default_rng(seed)
         m, d = self.model, self.data
         target = np.array([target[0], target[1]])
@@ -410,21 +461,32 @@ class HittingSim:
                                                         rng.uniform(-0.08, 0.08),
                                                         rng.uniform(-0.10, 0.10)])
         ball0 = LAUNCH_POS + np.array([0.0, y0, 0.0])
+        if launch is not None:
+            ball0, v_launch = (np.asarray(v, dtype=float).copy() for v in launch)
         set_ball(d, self.qadr, self.vadr, ball0, v_launch)
         mujoco.mj_forward(m, d)
 
         log = dict(ball=[], paddle=[], t=[], contact=None, landing=None,
-                   net_ok=True, target=target)
+                   net_ok=True, target=target, return_net_cross=None,
+                   return_net_contact=False, serve_bounces=[],
+                   serve_net_cross=None, serve_net_contact=False)
 
         # --- 预测来球 ---
-        samples = self.predict_incoming(ball0, v_launch)
-        inter = self.choose_intercept(samples, t_now_min=PERCEPT_DELAY + 0.20)
+        if incoming is None or service is None:
+            samples, service = self.inspect_serve(ball0, v_launch)
+        else:
+            samples = incoming
+        if not service['valid']:
+            return dict(outcome='invalid-serve', target=target, landing=None,
+                        err=None, net_ok=False, contact=None, service=service, log=None)
+        inter = self.choose_intercept(
+            samples, t_now_min=max(PERCEPT_DELAY + 0.20, service['bounces'][1][0] + 0.015))
 
         if inter is None:
             for _ in range(int(EVAL_TIMEOUT / m.opt.timestep)):
                 mujoco.mj_step(m, d)
             return dict(outcome='no-intercept', target=target, landing=None,
-                        err=None, net_ok=False, log=None)
+                        err=None, net_ok=False, contact=None, service=service, log=None)
 
         _, t_imp_rel, ball_pos, v_in, plat_t, q_hit, slack = inter
         t_imp = t_launch + t_imp_rel
@@ -446,28 +508,45 @@ class HittingSim:
             else:
                 v_pad = shot['v_pad']
         else:
+            shot = None
             v_pad = np.asarray(v_pad_override, dtype=float).copy()
 
         # --- 平台轨迹规划 (与预演一致) ---
         plan = self.make_plan(plat_t, v_pad, t_imp_rel)
+        plan_metrics = self.inspect_plan(plat_t, v_pad, t_imp_rel)
+        if v_pad_override is not None and not plan_metrics['valid']:
+            return dict(outcome='invalid-plan', target=target, landing=None,
+                        err=None, net_ok=False, contact=None, service=service, log=None)
 
         # --- 主仿真循环 ---
-        prev_x = ball_pos[0]
+        prev_x = ball0[0]
         impact_detected = False
+        touching_table = False
+        landing_time = None
+        peak_joint_speed = 0.0
+        peak_paddle_speed = 0.0
+        site_velocity = np.zeros(6)
+        min_joint_margin = float('inf')
+        overlay = TrajectoryOverlay([s[1] for s in samples]) if viewer is not None else None
+        wall_start = time.perf_counter()
         n_steps = int((EVAL_TIMEOUT + 1.0) / m.opt.timestep)
         for step in range(n_steps):
             τ = d.time - t_launch
             if step % 4 == 0:
                 self.servo_ctrl(m, d, plan, τ)
             mujoco.mj_step(m, d)
+            peak_joint_speed = max(peak_joint_speed, float(np.max(np.abs(d.qvel[self.motor_dofs]))))
+            angles = d.qpos[self.iface.qadr]
+            min_joint_margin = min(min_joint_margin, float(np.min(angles-kin.Q_PHYS_MIN)),
+                                   float(np.min(kin.Q_PHYS_MAX-angles)))
 
-            if viewer is not None and step % 4 == 0:
+            if viewer is not None and step % 40 == 0:
                 if not viewer.is_running():
-                    return dict(outcome='viewer-closed', target=target, landing=None,
-                                err=None, net_ok=False, log=log, contact=None)
-                viewer.sync()
+                    break
+                overlay.append(d.qpos[self.qadr:self.qadr+3])
+                sync_trajectory(viewer, overlay)
                 if realtime:
-                    time.sleep(0.001)
+                    time.sleep(max(0.0, d.time-t_launch-(time.perf_counter()-wall_start)))
 
             # 接触检测
             if not impact_detected:
@@ -481,25 +560,55 @@ class HittingSim:
             # 球状态
             bp = d.qpos[self.qadr:self.qadr+3].copy()
             bv = d.qvel[self.vadr:self.vadr+3].copy()
+            table_now = False
+            net_now = False
+            for c in range(d.ncon):
+                pair = {d.contact[c].geom1, d.contact[c].geom2}
+                table_now |= pair == {self.gid_ball, self.gid_table}
+                net_now |= pair == {self.gid_ball, self.gid_net}
             if record and step % 4 == 0:
                 log['ball'].append((τ, bp.copy()))
                 mujoco.mj_fwdPosition(m, d)
                 log['paddle'].append((τ, d.site_xpos[self.sid_paddle].copy()))
+            if step % 4 == 0:
+                mujoco.mj_fwdPosition(m, d)
+                mujoco.mj_fwdVelocity(m, d)
+                mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_SITE,
+                                        self.sid_paddle, site_velocity, 0)
+                peak_paddle_speed = max(peak_paddle_speed, float(np.linalg.norm(site_velocity[3:])))
+
+            if not impact_detected:
+                if table_now and not touching_table:
+                    log['serve_bounces'].append((float(τ), bp.copy()))
+                if net_now:
+                    log['serve_net_contact'] = True
+                if prev_x > 0 >= bp[0] and log['serve_net_cross'] is None:
+                    log['serve_net_cross'] = (float(τ), bp.copy())
 
             # 过网检查 (击球后)
             if impact_detected:
-                if prev_x <= 0.0 < bp[0] and bp[2] < NET_TOP + BALL_R:
-                    log['net_ok'] = False
+                if net_now and landing_time is None:
+                    log['return_net_contact'] = True
+                if prev_x <= 0.0 < bp[0] and landing_time is None:
+                    log['return_net_cross'] = (float(τ), bp.copy())
+                    if bp[2] < NET_TOP + BALL_R:
+                        log['net_ok'] = False
                 prev_x = bp[0]
-                # 落台 / 出界
-                if bv[2] < 0 and bp[2] <= TABLE_TOP + BALL_R + 0.002:
-                    if abs(bp[0]) <= 1.37 and abs(bp[1]) <= 0.7625 and bp[0] > 0.02:
+                if table_now and not touching_table and landing_time is None:
+                    landing_time = float(τ)
+                    if 0.02 < bp[0] < 1.35 and abs(bp[1]) < 0.74:
                         log['landing'] = (bp[0], bp[1])
-                    break
-                if bp[2] < 0.1:
+                    if not finish_recovery:
+                        break
+                if bp[2] < 0.1 and not finish_recovery:
                     break
             else:
                 prev_x = bp[0]
+            touching_table = table_now
+            if (finish_recovery and landing_time is not None and
+                    τ >= max(landing_time + 0.35,
+                             t_imp_rel + WINDOW/2 + RAMP_T + RECOVER_T + 0.10)):
+                break
 
             if τ > EVAL_TIMEOUT:
                 break
@@ -507,7 +616,9 @@ class HittingSim:
         # --- 评估 ---
         if log['landing'] is not None and impact_detected:
             err = np.linalg.norm(np.array(log['landing']) - target)
-            success = bool(err < TARGET_R and log['net_ok'])
+            success = bool(err < TARGET_R and log['net_ok'] and
+                           log['return_net_cross'] is not None and
+                           not log['return_net_contact'])
             if log['net_ok']:
                 aim = target - self.bias + np.array([0.45 * (target[0] - 0.58), 0.0])
                 self.bias = self.bias + 0.40 * (np.array(log['landing']) - aim)
@@ -518,133 +629,38 @@ class HittingSim:
         else:
             err = None
             outcome = 'missed'
+        bounces = log['serve_bounces']
+        net_cross = log['serve_net_cross']
+        actual_serve_valid = bool(len(bounces) == 2 and net_cross is not None and
+                                  not log['serve_net_contact'] and
+                                  0.08 < bounces[0][1][0] < 1.32 and
+                                  -1.32 < bounces[1][1][0] < -0.08 and
+                                  all(abs(b[1][1]) < 0.70 for b in bounces[:2]) and
+                                  bounces[0][0] < net_cross[0] < bounces[1][0] and
+                                  net_cross[1][2] > NET_TOP + BALL_R + 0.015)
+        legal_return = bool(actual_serve_valid and impact_detected and
+                            log['landing'] is not None and
+                            log['return_net_cross'] is not None and
+                            log['net_ok'] and not log['return_net_contact'])
+        if viewer is not None:
+            if viewer.is_running():
+                overlay.append(d.qpos[self.qadr:self.qadr+3])
+                sync_trajectory(viewer, overlay)
+            else:
+                outcome = 'viewer-closed'
         return dict(outcome=outcome, target=target, landing=log['landing'],
                     err=err, net_ok=log['net_ok'], log=log if record else None,
-                    contact=log['contact'], v_pad=v_pad.copy())
-
-    # ---------- 批量试验 ----------
-    def run(self, n_trials=20, seed0=1000, view=False):
-        results = []
-        t0 = time.time()
-        for i in range(n_trials):
-            rng = np.random.default_rng(seed0 + i)
-            target = TARGETS[rng.integers(len(TARGETS))]
-            r = self.run_trial(seed0 + i, target, record=(i < 6 or i % 5 == 0))
-            results.append(r)
-            err_s = f"{r['err']*100:5.1f}cm" if r['err'] is not None else "  ---"
-            print(f"  trial {i+1:2d}: {r['outcome']:>12s}  err={err_s}  "
-                  f"target=({target[0]:.2f},{target[1]:.2f})")
-        self.results = results
-        self.elapsed = time.time() - t0
-        return results
-
-    # ---------- 统计与绘图 ----------
-    def report(self, outdir="results"):
-        os.makedirs(outdir, exist_ok=True)
-        rs = self.results
-        n = len(rs)
-        succ = [r for r in rs if r['outcome'] == 'success']
-        landed = [r for r in rs if r['landing'] is not None]
-        errs = np.array([r['err'] for r in rs if r['err'] is not None])
-        net_fail = sum(1 for r in rs if not r['net_ok'] and r['outcome'] != 'no-intercept')
-        noic = sum(1 for r in rs if r['outcome'] == 'no-intercept')
-
-        print("\n" + "=" * 62)
-        print(f"  试验数        : {n}")
-        print(f"  成功 (落点<{TARGET_R*100:.0f}cm 且过网) : {len(succ)}/{n}  ({100*len(succ)/n:.0f}%)")
-        if len(errs):
-            print(f"  落点误差      : mean {errs.mean()*100:.1f} cm | max {errs.max()*100:.1f} cm")
-        print(f"  落台率        : {len(landed)}/{n}")
-        print(f"  触网失败      : {net_fail}/{n}")
-        print(f"  无法拦截      : {noic}/{n}")
-        print(f"  总耗时        : {self.elapsed:.1f}s")
-        print(f"  自适应偏差    : dx={self.bias[0]*100:+.1f}cm dy={self.bias[1]*100:+.1f}cm")
-        print("=" * 62)
-
-        # --- 落点散点图 ---
-        fig, ax = plt.subplots(figsize=(8, 5.6))
-        ax.add_patch(plt.Rectangle((0, -0.7625), 1.37, 1.525, fill=False, ec='k', lw=1.5))
-        ax.plot([0, 0], [-0.95, 0.95], 'g-', lw=2, label='net')
-        cmap = {'success': 'tab:green', 'missed': 'tab:orange', 'net': 'tab:red',
-                'no-intercept': 'tab:gray'}
-        for r in rs:
-            tx, ty = r['target']
-            ax.add_patch(plt.Circle((tx, ty), TARGET_R, fill=False, ec='b', ls='--', alpha=0.6))
-            if r['landing'] is not None:
-                ax.plot(*r['landing'], 'o', ms=8, color=cmap[r['outcome']], alpha=0.85)
-                ax.annotate('', xy=r['landing'], xytext=(tx, ty),
-                            arrowprops=dict(arrowstyle='->', color='0.6', lw=0.7))
-            else:
-                ax.plot(tx, ty, 'x', ms=10, color=cmap[r['outcome']], mew=2)
-        ax.set_xlabel('X (m)'); ax.set_ylabel('Y (m)')
-        ax.set_title(f'Landing distribution (success {len(succ)}/{n})')
-        handles = [plt.Line2D([], [], marker='o', ls='', color=c, label=l)
-                   for l, c in cmap.items() if any(r['outcome'] == l for r in rs)]
-        ax.legend(handles=handles, loc='upper left', fontsize=9)
-        ax.set_xlim(-0.15, 1.45); ax.set_ylim(-0.85, 0.85); ax.set_aspect('equal'); ax.grid(alpha=0.3)
-        fig.tight_layout()
-        fig.savefig(os.path.join(outdir, "hit_landing_scatter.png"), dpi=140)
-        plt.close(fig)
-
-        # --- 误差时间序列 ---
-        if len(errs):
-            fig, ax = plt.subplots(figsize=(8, 3.4))
-            xs = [i+1 for i, r in enumerate(rs) if r['err'] is not None]
-            es = [r['err']*100 for r in rs if r['err'] is not None]
-            cols = ['tab:green' if r['outcome'] == 'success' else 'tab:orange'
-                    for r in rs if r['err'] is not None]
-            ax.bar(xs, es, color=cols, alpha=0.85)
-            ax.axhline(TARGET_R*100, color='r', ls='--', label=f'success radius {TARGET_R*100:.0f}cm')
-            ax.set_xlabel('trial'); ax.set_ylabel('landing error (cm)')
-            ax.set_title('Landing error (adaptive bias learning)')
-            ax.legend(); ax.grid(alpha=0.3)
-            fig.tight_layout()
-            fig.savefig(os.path.join(outdir, "hit_error_series.png"), dpi=140)
-            plt.close(fig)
-
-        # --- 示例轨迹 3D ---
-        plotted = 0
-        for i, r in enumerate(rs):
-            if plotted >= 3:
-                break
-            if r['log'] is None or len(r['log']['ball']) < 10:
-                continue
-            log = r['log']
-            fig = plt.figure(figsize=(9, 6))
-            ax = fig.add_subplot(111, projection='3d')
-            bp = np.array([p for _, p in log['ball']])
-            pd = np.array([p for _, p in log['paddle']])
-            ax.plot(bp[:, 0], bp[:, 1], bp[:, 2], 'r-', lw=1.5, label='ball')
-            ax.plot(pd[:, 0], pd[:, 1], pd[:, 2], 'b-', lw=1.2, label='paddle center')
-            ax.scatter(*r['target'], color='g', s=80, marker='*', label='target')
-            if r['landing'] is not None:
-                ax.scatter(*r['landing'], color='orange', s=60, label='landing')
-            xs = np.array([-1.37, 1.37])
-            ys = np.array([-0.7625, 0.7625])
-            X, Y = np.meshgrid(xs, ys)
-            ax.plot_surface(X, Y, 0.76*np.ones_like(X), alpha=0.15, color='b')
-            ax.set_xlabel('X (m)'); ax.set_ylabel('Y (m)'); ax.set_zlabel('Z (m)')
-            ax.set_title(f"trial {i+1}: {r['outcome']}")
-            ax.legend(fontsize=8)
-            fig.tight_layout()
-            fig.savefig(os.path.join(outdir, f"hit_example_{i+1}.png"), dpi=130)
-            plt.close(fig)
-            plotted += 1
-        print(f"  figures saved to {outdir}/hit_*.png")
-
-
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--n', type=int, default=20)
-    ap.add_argument('--seed', type=int, default=1000)
-    args = ap.parse_args()
-
-    sim = HittingSim()
-    sim.calibrate_impact()
-    print(f"\n开始 {args.n} 次击球试验 (随机发球 + 随机目标落点)...")
-    sim.run(n_trials=args.n, seed0=args.seed)
-    sim.report()
-
-
-if __name__ == "__main__":
-    main()
+                    contact=log['contact'], v_pad=v_pad.copy(), service=service,
+                    legal_return=legal_return,
+                    actual_serve_valid=actual_serve_valid,
+                    actual_serve_bounces=bounces[:2],
+                    actual_serve_net_cross=net_cross,
+                    actual_serve_net_contact=log['serve_net_contact'],
+                    return_net_cross=log['return_net_cross'],
+                    return_net_contact=log['return_net_contact'],
+                    intercept=(t_imp_rel, ball_pos.copy(), plat_t.copy(), float(slack)),
+                    plan_metrics=plan_metrics,
+                    actual_peak_joint_speed_radps=peak_joint_speed,
+                    actual_peak_paddle_speed_mps=peak_paddle_speed,
+                    actual_min_joint_margin_rad=min_joint_margin,
+                    shot=shot if v_pad_override is None else None)

@@ -1,25 +1,10 @@
 name: mujoco-sim-win
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - python=3.11
-  # 强制限制 numpy < 2.0，避免与 PyTorch 2.3.1 的底层 C++ 库产生 ABI 冲突
-  - numpy<2.0
-  - scipy
-  - matplotlib
-  - quaternion
-  # 预装 mkl 库，防止 Windows 下 pip 安装的 torch 找不到 fbgemm.dll
-  - mkl
-  - mkl-include
+  - numpy>=1.24,<2.0
+  - matplotlib>=3.7
   - pip
   - pip:
-      - mujoco>=3.0.0
-      # Windows 平台下，使用指定 index-url 下载带有内置 DLL 的官方 CPU Wheel，
-      # 并固定版本为 2.3.1 以确保最高稳定性，避免 [WinError 127] 和 [WinError 182]
-      - --extra-index-url https://download.pytorch.org/whl/cpu
-      - torch==2.3.1+cpu
-      - torchvision==0.18.1+cpu
-      - torchaudio==2.3.1+cpu
-      # pygame for PS2 joystick support
-      - pygame>=2.5.0
+      - mujoco==3.6.0

@@ -1,9 +1,0 @@
-{
-  "requested_balls": 10,
-  "simulated_balls": 10,
-  "contacts": 10,
-  "landings": 10,
-  "success_100mm": 10,
-  "mean_landing_error_m": 0.03849823732060315,
-  "max_landing_error_m": 0.03849823732060315
-}

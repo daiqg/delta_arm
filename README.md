@@ -25,12 +25,11 @@ cd delta_arm
 cd delta_sim
 conda env create -f environment_win.yml
 conda activate mujoco-sim-win
-python -m pip install mujoco==3.6.0
 ```
 
-创建成功后会得到名为 `mujoco-sim-win` 的环境，使用 Python 3.11。最后一条命令固定 MuJoCo 3.6.0，便于对比验证结果。
+创建成功后会得到名为 `mujoco-sim-win` 的环境，使用 Python 3.11；环境文件直接安装固定版本的 MuJoCo 3.6.0，便于对比验证结果。
 
-[environment_win.yml](delta_sim/environment_win.yml) 包含 NumPy <2、Matplotlib、SciPy、MuJoCo、PyTorch CPU 等依赖；部分依赖用于兼容原有环境，并非这两个仿真的必需项。配置没有锁定全部依赖，不能保证不同时间安装的环境逐包相同。
+[environment_win.yml](delta_sim/environment_win.yml) 仅包含仿真需要的 NumPy、Matplotlib、MuJoCo 和安装工具。配置没有锁定全部间接依赖，不能保证不同时间安装的环境逐包相同。
 
 **后续命令均在同一个终端、`delta_arm/delta_sim/` 目录中执行。** 每一步成功后再继续。如果环境已存在，跳过创建步骤，激活后确认依赖可用；不要重复创建同名环境。IDE 运行时也应选择该 Conda 环境的解释器。
 
@@ -75,17 +74,17 @@ Get-Content results/traj_helix_metrics.json
 python continuous_hitting.py --nballs 10
 ```
 
-程序使用已验证的固定拍速，在 MuJoCo 窗口中逐球演示发球、挥拍与落点，终端输出每球结果。
+程序随机生成候选来球，先在 MuJoCo 中筛出符合双方落台、过网且可被机械臂安全拦截的发球，再试算若干拍速，选择能真实过网并落到发球方台面的回球。完整准备 10 球后才打开窗口，以正常时间节奏连续执行；终端的 `Preparing...` 表示正在筛选，请等待。蓝色虚线为预测来球路径，橙色为实际球路，包含两次发球落台、击球、回球落台弹起及机械臂回位。
 
-**等待终端输出第 10 球后，正常关闭窗口，程序才保存本轮汇总、CSV 和最终截图。** 提前关窗会得到不完整的球数记录。随后查看：
+第 10 球结束后立即保存汇总、CSV 和截图，并保留窗口供查看；关闭窗口退出。也可使用 `python continuous_hitting.py --nballs 10 --auto-close` 自动结束。提前关窗会保存不完整的球数记录。随后查看：
 
 ```powershell
-Get-Content results/continuous_10_summary.json
+Get-Content results/random_10_summary.json
 ```
 
-检查 `requested_balls` 和 `simulated_balls` 是否均为 10，再查看 `contacts`、`landings`、`success_100mm`。成功判据包含触球、过网检查、对方台面落点和目标误差小于 100 mm；不能只凭文件名判断完成情况。
+检查 `requested_balls` 和 `simulated_balls` 是否均为 10，再查看 `legal_serves`、`reachable_serves`、`paddle_contacts`、`legal_returns` 和 `motion_within_limits`。`target_hits_100mm` 另表示落点距目标小于 100 mm 的球数。逐球初态、两次台面接触、球网通过高度、实际峰值速度和回球落点在 `results/random_10_balls.csv`；2 ms 采样的球及拍心轨迹在 `results/random_10_trajectories.csv`。
 
-当前竖直拍面模型的固定来球 10 球验证结果为拍面接触 10/10、对方落台 10/10、目标成功 10/10，落点误差约 38.5 mm。演示每球复位仿真状态，且来球与拍速相同，不代表随机来球或实机成功率。运行会覆盖同名结果文件，以本次生成的数据为准。
+使用 MuJoCo 3.6.0、默认种子的一轮验证中，规范发球、可达、拍面接触、合法回球和全程运动约束均为 10/10，筛选做了 85 次完整试打。实际最大拍速 1.191 m/s，最大关节速度 11.145 rad/s，最小关节限位余量 2.72°；GUI 与无窗口结果一致。回球落点 X 为 0.189～0.370 m，均在对方台面内，但距 (0.58, 0) m 的目标 100 mm 内为 0/10，尚未优化定点落球。每球复位仿真状态，且回球在显示前经过离线物理试算，因此此演示不能代表在线控制或实机成功率。这里只模拟发球机出球后的单打球路，不包含人的手掌与抛球动作。运行会覆盖同名随机结果文件；可用 `--output results/my_run` 指定独立目录。
 
 ## 6. 可选：无窗口运行
 
@@ -96,7 +95,7 @@ python run_trajectory.py --shape all --cycles 1 --headless
 python continuous_hitting.py --nballs 10 --headless --no-realtime
 ```
 
-`--headless` 只关闭交互窗口，离屏截图仍需要 OpenGL。随机来球离线评估使用 `python run_hitting.py --n 1 --seed 1000`，其参数和输出见详细指南。
+`--headless` 只关闭交互窗口，离屏截图仍需要 OpenGL。发球筛选和数据字段见详细指南。
 
 - [详细使用指南](delta_sim/README.md)：参数、坐标系、输出字段与排错。
 - [工作总结](WORK_SUMMARY.md)：结构设计、验证记录、已知问题与 sim2real 限制。
