@@ -1,0 +1,1892 @@
+[
+  {
+    "ball": 1,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999925,
+        "predicted_ball_x_m": -0.646480338489861,
+        "predicted_ball_z_m": 0.8088562402932703,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.7531824387460064,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.006268800003454089
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6423301479066994,
+        "predicted_ball_z_m": 0.8332249253548092,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.49048357019845623,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.005400399910286069
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6426880004376215,
+        "predicted_ball_z_m": 0.84331713647085,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5571781210586074,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.004779200069606304
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6432253666950328,
+        "predicted_ball_z_m": 0.8344856015649217,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.4197276194447591,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.004227700177580118
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 2,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.675999999999992,
+        "predicted_ball_x_m": -0.6494872787940179,
+        "predicted_ball_z_m": 0.8928842172328111,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.40777218407275495,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.0060928999446332455
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.642796720749691,
+        "predicted_ball_z_m": 0.8836251160446125,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5195630472422395,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.005358400056138635
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999949,
+        "predicted_ball_x_m": -0.6413496261278498,
+        "predicted_ball_z_m": 0.8703146006949112,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.49872585082538035,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.004828799981623888
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6494452544861042,
+        "predicted_ball_z_m": 0.8613738800907222,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3649021696334871,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.0038499999791383743
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 3,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6639999999999934,
+        "predicted_ball_x_m": -0.6407336289127985,
+        "predicted_ball_z_m": 0.880457084405253,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.24790683232472477,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.006096499972045422
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6720000000000006,
+        "predicted_ball_x_m": -0.6407731960282589,
+        "predicted_ball_z_m": 0.8970506532076129,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5472295860880404,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.0055195000022649765
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999949,
+        "predicted_ball_x_m": -0.6441974990247582,
+        "predicted_ball_z_m": 0.8949700369013042,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5642872501155655,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.004760399926453829
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999838,
+        "predicted_ball_x_m": -0.6431986242430489,
+        "predicted_ball_z_m": 0.8738669528803586,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.40002307732718123,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.0038612000644207
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 4,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.675999999999992,
+        "predicted_ball_x_m": -0.6596486960229899,
+        "predicted_ball_z_m": 0.8027680247382483,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.7572715144525364,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.006245699943974614
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6422099845554955,
+        "predicted_ball_z_m": 0.8561095355813595,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6802560849674303,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.006128799868747592
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6497601488915925,
+        "predicted_ball_z_m": 0.8527703230072521,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5109346269945227,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.004585500108078122
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6452400278007427,
+        "predicted_ball_z_m": 0.8565298611106923,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5919529008293739,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.00399750005453825
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 5,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6446770394276669,
+        "predicted_ball_z_m": 0.8095245989548653,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.4828108562756852,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.006888400064781308
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6435271997008652,
+        "predicted_ball_z_m": 0.8522575755117069,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3867070465487442,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.005526300054043531
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999949,
+        "predicted_ball_x_m": -0.6447882529095563,
+        "predicted_ball_z_m": 0.8798877397635925,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5779055657498726,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.00520929996855557
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6412709634158905,
+        "predicted_ball_z_m": 0.8684638579472687,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5563865547627586,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.004382400074973702
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 6,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6431800754540502,
+        "predicted_ball_z_m": 0.8582694905236569,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.4130106566179632,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.03950049984268844
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6720000000000006,
+        "predicted_ball_x_m": -0.6438391117116696,
+        "predicted_ball_z_m": 0.8892704902821783,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.43056784320954156,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.027862299932166934
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999949,
+        "predicted_ball_x_m": -0.6412197196078985,
+        "predicted_ball_z_m": 0.9015162418150596,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5888337288449111,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.025291299913078547
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6455290173217144,
+        "predicted_ball_z_m": 0.9090884424896468,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4820806512620651,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.020104499999433756
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 7,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6477064309670858,
+        "predicted_ball_z_m": 0.9309005185555296,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4523939994441154,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.02762600011192262
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6720000000000006,
+        "predicted_ball_x_m": -0.6488162382851171,
+        "predicted_ball_z_m": 0.8704220760883754,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5940736229773235,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.02076019998639822
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999949,
+        "predicted_ball_x_m": -0.6429088519352992,
+        "predicted_ball_z_m": 0.8366894646204901,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.580354588118065,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.021111200097948313
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6484176520703449,
+        "predicted_ball_z_m": 0.8438477768415714,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5826258387177445,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.023658599937334657
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 8,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999925,
+        "predicted_ball_x_m": -0.6424101618434936,
+        "predicted_ball_z_m": 0.8763021198236588,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4385771109933738,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.013552200049161911
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6800000000000006,
+        "predicted_ball_x_m": -0.6493916780091593,
+        "predicted_ball_z_m": 0.8613580517405319,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5103066526802427,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.026164900045841932
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6503021452461596,
+        "predicted_ball_z_m": 0.8550645401445308,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4788576069014351,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.021004099864512682
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6431543836765855,
+        "predicted_ball_z_m": 0.8391645556825775,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.42290338747203415,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.017973599955439568
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 9,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.675999999999992,
+        "predicted_ball_x_m": -0.6410814932491687,
+        "predicted_ball_z_m": 0.8843034256608484,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4694921813539771,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.04752819985151291
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6800000000000006,
+        "predicted_ball_x_m": -0.642188816162943,
+        "predicted_ball_z_m": 0.8540654316254777,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5133438799255667,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.020098199835047126
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.683999999999995,
+        "predicted_ball_x_m": -0.643742131223895,
+        "predicted_ball_z_m": 0.873997555829629,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6734623439682333,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.02373669994994998
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6458225429430001,
+        "predicted_ball_z_m": 0.862214346388579,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6127016933560475,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.04904820001684129
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 10,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999925,
+        "predicted_ball_x_m": -0.650237785272238,
+        "predicted_ball_z_m": 0.8187649729278231,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.7018271828694208,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.02963509992696345
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6720000000000006,
+        "predicted_ball_x_m": -0.6492255196722466,
+        "predicted_ball_z_m": 0.8593393878820346,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6072174576076973,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.016245999839156866
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999949,
+        "predicted_ball_x_m": -0.6402514780442368,
+        "predicted_ball_z_m": 0.8608172442983554,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4666296573396427,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.025099199963733554
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6410699937542861,
+        "predicted_ball_z_m": 0.8769603540208138,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4907080489156914,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.019870199961587787
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 11,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999925,
+        "predicted_ball_x_m": -0.6404539352357949,
+        "predicted_ball_z_m": 0.8765050069034861,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4714764437951712,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.021316199796274304
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.649441367403127,
+        "predicted_ball_z_m": 0.8689388870367587,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5715915147950474,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.016210499918088317
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999949,
+        "predicted_ball_x_m": -0.6417409475541331,
+        "predicted_ball_z_m": 0.8575712324407292,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5163558343158137,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.02038090000860393
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6478949190294861,
+        "predicted_ball_z_m": 0.8542671925572369,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4879091851860987,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.018169699935242534
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 12,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.675999999999992,
+        "predicted_ball_x_m": -0.6471537196960605,
+        "predicted_ball_z_m": 0.9028148118953643,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.27680859580953676,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.022614900022745132
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6437484358209837,
+        "predicted_ball_z_m": 0.8789600497548086,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6452637974928335,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.020493899937719107
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6399100231654933,
+        "predicted_ball_z_m": 0.8487422075712869,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3994744321088397,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.02165169990621507
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6425301186011532,
+        "predicted_ball_z_m": 0.8561502736652067,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6765487853261569,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.017141900025308132
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 13,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6446333827830414,
+        "predicted_ball_z_m": 0.8905153690358182,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.25319243040858364,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.021767199970781803
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.644273993448901,
+        "predicted_ball_z_m": 0.9126473066589526,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.39542428438167976,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.02094219997525215
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999949,
+        "predicted_ball_x_m": -0.6466871688868224,
+        "predicted_ball_z_m": 0.9126271470779868,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.399683962591071,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.024687400087714195
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6462575781333874,
+        "predicted_ball_z_m": 0.9099921202182861,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.42556948132542216,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.019929999951273203
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 14,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.675999999999992,
+        "predicted_ball_x_m": -0.6448625879947609,
+        "predicted_ball_z_m": 0.9259792897519403,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.25808289547432317,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.029254699824377894
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6800000000000006,
+        "predicted_ball_x_m": -0.6463728145230129,
+        "predicted_ball_z_m": 0.8650727259292333,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.40669072473347867,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.022026499966159463
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6451525114347757,
+        "predicted_ball_z_m": 0.8455405568068239,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6336264499874996,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.018778500147163868
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6478635114461255,
+        "predicted_ball_z_m": 0.8386066361874165,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5875656980087118,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.015107700135558844
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 15,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.675999999999992,
+        "predicted_ball_x_m": -0.6435377416951267,
+        "predicted_ball_z_m": 0.8495213029588707,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.667499802131654,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.02383620012551546
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6800000000000006,
+        "predicted_ball_x_m": -0.6454048484552872,
+        "predicted_ball_z_m": 0.8779400828611911,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.640612997838506,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.022875400027260184
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6474458780726098,
+        "predicted_ball_z_m": 0.867489887131753,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.48858086886345076,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.0163334000390023
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6491234733131357,
+        "predicted_ball_z_m": 0.8724818846810389,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.599239482097629,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.015000199899077415
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 16,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "no-intercept",
+        "compute_s": 0.01795880007557571
+      },
+      {
+        "time_s": 0.2400000000000002,
+        "observation_time_s": 0.16000000000000014,
+        "observation_age_s": 0.08000000000000007,
+        "status": "no-intercept",
+        "compute_s": 0.01920920005068183
+      },
+      {
+        "time_s": 0.30199999999999444,
+        "observation_time_s": 0.2200000000000002,
+        "observation_age_s": 0.08199999999999424,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6429137703662704,
+        "predicted_ball_z_m": 0.9242058896254899,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4597348874983975,
+        "ready_time_s": 0.4019999999999945,
+        "compute_s": 0.018871399806812406
+      },
+      {
+        "time_s": 0.4039999999999832,
+        "observation_time_s": 0.31999999999999246,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999927,
+        "predicted_ball_x_m": -0.6417973966694385,
+        "predicted_ball_z_m": 0.8432882563824778,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5329111825986471,
+        "ready_time_s": 0.5039999999999832,
+        "compute_s": 0.017540400149300694
+      },
+      {
+        "time_s": 0.505999999999972,
+        "observation_time_s": 0.41999999999998144,
+        "observation_age_s": 0.08599999999999058,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999816,
+        "predicted_ball_x_m": -0.6403345717388296,
+        "predicted_ball_z_m": 0.8307393865518822,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6168456642968176,
+        "ready_time_s": 0.605999999999972,
+        "compute_s": 0.012582600116729736
+      }
+    ],
+    "activation_times_s": [
+      0.4039999999999832,
+      0.505999999999972,
+      0.6079999999999608
+    ]
+  },
+  {
+    "ball": 17,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "no-intercept",
+        "compute_s": 0.027048699790611863
+      },
+      {
+        "time_s": 0.2400000000000002,
+        "observation_time_s": 0.16000000000000014,
+        "observation_age_s": 0.08000000000000007,
+        "status": "no-intercept",
+        "compute_s": 0.022041700081899762
+      },
+      {
+        "time_s": 0.30199999999999444,
+        "observation_time_s": 0.2200000000000002,
+        "observation_age_s": 0.08199999999999424,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6426500740664397,
+        "predicted_ball_z_m": 0.9518786959738812,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4842135689502115,
+        "ready_time_s": 0.4019999999999945,
+        "compute_s": 0.015331299975514412
+      },
+      {
+        "time_s": 0.4039999999999832,
+        "observation_time_s": 0.31999999999999246,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999927,
+        "predicted_ball_x_m": -0.6485566165289786,
+        "predicted_ball_z_m": 0.8571524590819457,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3753147953158763,
+        "ready_time_s": 0.5039999999999832,
+        "compute_s": 0.023095100186765194
+      },
+      {
+        "time_s": 0.505999999999972,
+        "observation_time_s": 0.41999999999998144,
+        "observation_age_s": 0.08599999999999058,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999816,
+        "predicted_ball_x_m": -0.6398245891845274,
+        "predicted_ball_z_m": 0.8597891745925685,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6779071260441617,
+        "ready_time_s": 0.605999999999972,
+        "compute_s": 0.014919399982318282
+      }
+    ],
+    "activation_times_s": [
+      0.4039999999999832,
+      0.505999999999972,
+      0.6079999999999608
+    ]
+  },
+  {
+    "ball": 18,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6639999999999934,
+        "predicted_ball_x_m": -0.6452405984700766,
+        "predicted_ball_z_m": 0.910863209108294,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.09338523820880373,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.028218300081789494
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6800000000000006,
+        "predicted_ball_x_m": -0.6494277456922533,
+        "predicted_ball_z_m": 0.8902915806899455,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.45954948658699935,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.02234140015207231
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6445756712971735,
+        "predicted_ball_z_m": 0.8467520263348278,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5596357891405834,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.01935910014435649
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6427700035431313,
+        "predicted_ball_z_m": 0.8375896197663655,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.40935118908911405,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.015585799934342504
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 19,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6469933917034414,
+        "predicted_ball_z_m": 0.8122923259616116,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5044677959501289,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.030812400160357356
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6478931858333827,
+        "predicted_ball_z_m": 0.878532511714975,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4260667809332861,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.022271000081673265
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999949,
+        "predicted_ball_x_m": -0.6401040568400164,
+        "predicted_ball_z_m": 0.9009782473175062,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5425972784138228,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.02794330008327961
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6396290622768117,
+        "predicted_ball_z_m": 0.895929016817978,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5240301172013446,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.018111600074917078
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 20,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6599999999999938,
+        "predicted_ball_x_m": -0.6440805290238071,
+        "predicted_ball_z_m": 0.8240741789545061,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.4771185030183088,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.020596900023519993
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6494383748739104,
+        "predicted_ball_z_m": 0.8744309855626644,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4196537573076137,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.024920199997723103
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999949,
+        "predicted_ball_x_m": -0.6452283762313749,
+        "predicted_ball_z_m": 0.8646006157797425,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3332386297981301,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.02703500003553927
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999838,
+        "predicted_ball_x_m": -0.6444607497717472,
+        "predicted_ball_z_m": 0.8871240567547544,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5275319652851578,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.02468820009380579
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 21,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999925,
+        "predicted_ball_x_m": -0.6431352430565118,
+        "predicted_ball_z_m": 0.8419944269563768,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.52334893779667,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.027865800075232983
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.641741708014678,
+        "predicted_ball_z_m": 0.8683053420517951,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4291278840044873,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.026882000034675002
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.647861168678586,
+        "predicted_ball_z_m": 0.8880361137863495,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.44320431284287776,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.019067300017923117
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6498461135406898,
+        "predicted_ball_z_m": 0.8709303251222008,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.321318893359952,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.02138010016642511
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 22,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6639999999999934,
+        "predicted_ball_x_m": -0.6460680380997328,
+        "predicted_ball_z_m": 0.9221944707138627,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5069600014569842,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.019816499901935458
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6720000000000006,
+        "predicted_ball_x_m": -0.6461617989076868,
+        "predicted_ball_z_m": 0.8818654007463755,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.41923135924781085,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.027334099868312478
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999949,
+        "predicted_ball_x_m": -0.6412275971962244,
+        "predicted_ball_z_m": 0.8750536380196405,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3951442681293361,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.016260300064459443
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6434035336696953,
+        "predicted_ball_z_m": 0.8778151789709765,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.41261566994459775,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.017079300014302135
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 23,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6443193713700305,
+        "predicted_ball_z_m": 0.9384062497651556,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3294726409932738,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.03286950010806322
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.649999756674814,
+        "predicted_ball_z_m": 0.8765055752009219,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.34535490063715735,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.03657980007119477
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999949,
+        "predicted_ball_x_m": -0.6434151983679335,
+        "predicted_ball_z_m": 0.865345462578948,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6031189431429256,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.02238969993777573
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999838,
+        "predicted_ball_x_m": -0.6397591345156459,
+        "predicted_ball_z_m": 0.8445841582604264,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.4580780276882255,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.017147900070995092
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 24,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999925,
+        "predicted_ball_x_m": -0.6429711313461284,
+        "predicted_ball_z_m": 0.9270829232604839,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.10879610446149723,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.023415599949657917
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6800000000000006,
+        "predicted_ball_x_m": -0.6467462573138497,
+        "predicted_ball_z_m": 0.8755535899772542,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.38541063070185755,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.018904400058090687
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.683999999999995,
+        "predicted_ball_x_m": -0.6499411020428897,
+        "predicted_ball_z_m": 0.8587874544728986,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5870323486849366,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.023106700042262673
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6839999999999838,
+        "predicted_ball_x_m": -0.6467188206391546,
+        "predicted_ball_z_m": 0.8590060103796471,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6580955772287772,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.02171839983202517
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 25,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6456973374125191,
+        "predicted_ball_z_m": 0.9377493109170175,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.3941210621255439,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.02613250003196299
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6418083301855598,
+        "predicted_ball_z_m": 0.869381892228888,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.49582973035669664,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.028217999963089824
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6453695022333675,
+        "predicted_ball_z_m": 0.8508140699027605,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5390494537595579,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.025715500116348267
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6420707280499092,
+        "predicted_ball_z_m": 0.8530666906220483,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6834184026127157,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.020174900069832802
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 26,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6599999999999938,
+        "predicted_ball_x_m": -0.649385114937072,
+        "predicted_ball_z_m": 0.8237871867418407,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.7176430201493285,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.03555670008063316
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6720000000000006,
+        "predicted_ball_x_m": -0.6411880204118676,
+        "predicted_ball_z_m": 0.8695094658005645,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.524427306081632,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.019027699949219823
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999949,
+        "predicted_ball_x_m": -0.6446102373731208,
+        "predicted_ball_z_m": 0.8813984278500229,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5711103251676466,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.015859900042414665
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6494705633303717,
+        "predicted_ball_z_m": 0.8708738758544347,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.40253164991892065,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.014852600172162056
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 27,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6839999999999912,
+        "predicted_ball_x_m": -0.6489009550859977,
+        "predicted_ball_z_m": 0.9366013351226029,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.24193416887187003,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.026074199937283993
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6413755242696001,
+        "predicted_ball_z_m": 0.8789472562718919,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5590752229967636,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.02411579992622137
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999949,
+        "predicted_ball_x_m": -0.6417898767857539,
+        "predicted_ball_z_m": 0.8683804636802677,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6068741211525457,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.026660599978640676
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6448525099556799,
+        "predicted_ball_z_m": 0.8673481202244906,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.6509412745819667,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.024303199956193566
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 28,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.675999999999992,
+        "predicted_ball_x_m": -0.6478875842746319,
+        "predicted_ball_z_m": 0.9317911269416415,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.2548676100541839,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.0338228999171406
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6401235244751463,
+        "predicted_ball_z_m": 0.8716816728698191,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3159099942127781,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.020275999791920185
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999949,
+        "predicted_ball_x_m": -0.6439297870008469,
+        "predicted_ball_z_m": 0.8602410575695884,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5455831031223468,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.01791259995661676
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6799999999999838,
+        "predicted_ball_x_m": -0.6476142526458042,
+        "predicted_ball_z_m": 0.8625554840772472,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.476632815351417,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.019925199914723635
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 29,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6441867959372186,
+        "predicted_ball_z_m": 0.8965305120159909,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5539768843152569,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.027332999976351857
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6760000000000006,
+        "predicted_ball_x_m": -0.6480830972747939,
+        "predicted_ball_z_m": 0.8440445369438139,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5891799630515647,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.02704980014823377
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999949,
+        "predicted_ball_x_m": -0.6411643095410327,
+        "predicted_ball_z_m": 0.8229435524506049,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.44083850715571127,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.021183199947699904
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6759999999999838,
+        "predicted_ball_x_m": -0.6407410052910743,
+        "predicted_ball_z_m": 0.8262689390197778,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.4521636739385031,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.02435729978606105
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  },
+  {
+    "ball": 30,
+    "events": [
+      {
+        "time_s": 0.18000000000000016,
+        "observation_time_s": 0.10000000000000009,
+        "observation_age_s": 0.08000000000000007,
+        "status": "scheduled",
+        "impact_time_s": 0.6679999999999929,
+        "predicted_ball_x_m": -0.6419472923261598,
+        "predicted_ball_z_m": 0.8806996209362119,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.3361677607805875,
+        "ready_time_s": 0.28000000000000014,
+        "compute_s": 0.0210551000200212
+      },
+      {
+        "time_s": 0.28199999999999664,
+        "observation_time_s": 0.20000000000000018,
+        "observation_age_s": 0.08199999999999646,
+        "status": "scheduled",
+        "impact_time_s": 0.6680000000000006,
+        "predicted_ball_x_m": -0.6450811806777574,
+        "predicted_ball_z_m": 0.8877500993422367,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5475945151102295,
+        "ready_time_s": 0.3819999999999967,
+        "compute_s": 0.03501749993301928
+      },
+      {
+        "time_s": 0.3839999999999854,
+        "observation_time_s": 0.29999999999999466,
+        "observation_age_s": 0.08399999999999075,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999949,
+        "predicted_ball_x_m": -0.6402256366740611,
+        "predicted_ball_z_m": 0.8683298948041062,
+        "predicted_legal": 0,
+        "predicted_landing_x_m": 0.39336867003177445,
+        "ready_time_s": 0.48399999999998544,
+        "compute_s": 0.027390799950808287
+      },
+      {
+        "time_s": 0.4859999999999742,
+        "observation_time_s": 0.39999999999998365,
+        "observation_age_s": 0.08599999999999053,
+        "status": "scheduled",
+        "impact_time_s": 0.6719999999999838,
+        "predicted_ball_x_m": -0.6459594616105002,
+        "predicted_ball_z_m": 0.8750338240466184,
+        "predicted_legal": 1,
+        "predicted_landing_x_m": 0.5037102704209655,
+        "ready_time_s": 0.5859999999999742,
+        "compute_s": 0.022722800029441714
+      }
+    ],
+    "activation_times_s": [
+      0.28199999999999664,
+      0.3839999999999854,
+      0.4859999999999742,
+      0.587999999999963
+    ]
+  }
+]

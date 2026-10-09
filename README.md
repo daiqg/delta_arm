@@ -66,19 +66,19 @@ Get-Content results/traj_helix_metrics.json
 
 轨迹主要 XY 尺寸约为 80～110 mm；螺旋线半径 40 mm，总 Z 行程 40 mm。调整形状、周期数及显示方式见[详细指南](delta_sim/README.md)。
 
-## 5. 在线连续十球
+## 5. 在线连续击球（30 球）
 
 在安装依赖、激活环境并进入 `delta_sim/` 后执行：
 
 ```powershell
-python continuous_hitting.py --nballs 10
+python continuous_hitting.py --nballs 30
 ```
 
 默认打开 MuJoCo 窗口：蓝色为最近一次在线预测，橙色为实际球路。每球复位后重新发球；结束后保留窗口，关闭窗口退出。加 `--auto-close` 可自动关闭。
 
 ```powershell
-python continuous_hitting.py --nballs 10 --headless --no-realtime --output results/my_run
-Get-Content results/my_run/online_10_summary.json
+python continuous_hitting.py --nballs 30 --headless --no-realtime --output results/my_run
+Get-Content results/my_run/online_30_summary.json
 python verify_online_control.py
 ```
 
@@ -102,6 +102,23 @@ python verify_online_control.py
 `online_<n>_summary.json` 汇总合法发球、接触、严格回球、规划超时和运动约束；`online_<n>_balls.csv` 保存逐球指标，`online_<n>_trajectories.csv` 保存球与拍心轨迹，`online_<n>_controller.json` 保存每次规划的观测年龄、耗时、候选状态及发布时间，`online_<n>_final.png` 保存最终场景。逐球估计 RMSE 使用同一采集时刻的真值，仅供评估。
 
 旧预演版保持不变：`python continuous_hitting_rehearsal.py --nballs 10`，输出仍为 `random_10_*`。它的回球经过离线筛选，不能当作在线性能。
+
+### 30 球参考结果
+
+MuJoCo 3.6.0、种子 `20261007`、80 ms 观测延迟、2 mm 测量噪声下，一轮连续 30 球获得 **26/30（86.7%）严格规范回球**；合法且可达发球、球拍接触、运动约束合格均为 30/30，规划超时为 0。第 3、4、6、13 球触网，未记录到对方台面有效落点。峰值拍速 1.1384 m/s，峰值关节速度 9.2106 rad/s。
+
+该指标要求不触网并留有过网余量，比正式规则严格；每球重置后再发球，不是双方连续对拉。单轮结果不代表任意来球成功率，也不保证不同机器负载下结果完全相同。完整记录见 [30 球结果](delta_sim/results/online_30_validation/online_30_summary.json)及同目录逐球 CSV、轨迹、控制日志和截图。它与此前三个种子各 10 球的统计不同，且默认种子的前 10 球重叠，不能视为独立测试相加。
+
+### 文件用途
+
+- `run_trajectory.py`、`trajectory_view.py`：五种末端轨迹与 MuJoCo 可视化。
+- `continuous_hitting.py`、`online_control.py`：在线预测、滚动规划及连续击球。
+- `run_hitting.py`、`kinematics.py`、XML 和 `meshes/`：共享物理场景、运动学和 CAD 资源，不应删除。
+- `continuous_hitting_rehearsal.py`：保留的离线预演对照，在线入口还复用其发球机定位函数。
+- `make_paddle_robot.py`、`preview_model.py`、`verify_*.py`：模型生成、查看和必要校验。
+- `results/`：参考结果；新增临时实验默认不加入 Git，避免调参输出混入发布版本。
+
+本仓库可独立运行，不依赖旁边的旧项目目录。详细设计和历史问题记录仍保留在工作总结与在线优化记录中。
 
 ## 6. 可选：无窗口运行
 

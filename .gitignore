@@ -8,3 +8,10 @@ MUJOCO_LOG.TXT
 .idea/
 .DS_Store
 *.log
+
+# Generated experiments stay local; keep the documented reference outputs.
+delta_sim/results/*
+!delta_sim/results/model_*.png
+!delta_sim/results/traj_*
+!delta_sim/results/random_10_*
+!delta_sim/results/online_30_validation/

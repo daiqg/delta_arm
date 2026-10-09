@@ -1,0 +1,27 @@
+{
+  "mode": "causal_online_receding_horizon",
+  "seed": 20261007,
+  "requested_balls": 30,
+  "simulated_balls": 30,
+  "measurement_delay_s": 0.08,
+  "measurement_noise_std_m": 0.002,
+  "control_period_s": 0.06,
+  "compute_budget_s": 0.1,
+  "paddle_collision_model": "planar_elliptical_prism",
+  "mujoco_version": "3.6.0",
+  "legal_serves": 30,
+  "reachable_serves": 30,
+  "paddle_contacts": 30,
+  "legal_returns": 26,
+  "controller_deadline_misses": 0,
+  "controller_too_late": 0,
+  "max_paddle_speed_mps": 1.1384403581433065,
+  "max_joint_speed_radps": 9.210640615186854,
+  "min_joint_margin_rad": 0.13575304655991807,
+  "motion_within_limits": 30,
+  "notes": [
+    "No return trajectory was screened before launch.",
+    "Ground-truth ball velocity is not an online controller input.",
+    "Estimator error is offline evaluation only."
+  ]
+}
