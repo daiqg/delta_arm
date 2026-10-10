@@ -1,6 +1,6 @@
 # Research worksheet only. Not a ROS parameter file or executable driver config.
 schema_version: 1
-status: documentation_only
+status: cad_intake_complete_hardware_pending
 hardware_enable_allowed: false
 source:
   model_in_manual: DM-J4310-2ECV1.1
@@ -44,9 +44,19 @@ communication:
   feedback_period_s: null
   drive_watchdog_s: null
 mechanics:
-  cad_revision: null
-  robot_geometry: null
-  joint_names: [motor_arm_joint1, motor_arm_joint2, motor_arm_joint3]
+  cad_revision: 'STEP internal assembly name: Delta v9; formal revision unconfirmed'
+  cad_received_date: '2026-10-10'
+  cad_source_sha256: 93b8c6db575d29a76050ddd1a1d3053732322ea168e9a12c09ae7b00522e2fa0
+  robot_geometry: ../cad/geometry.json  # Relative to this worksheet, SI units.
+  geometry_status: cad_extracted_not_physically_calibrated
+  cad_materials_accepted: false  # All 41 assignments are steel/7850 kg/m3, even carbon/aluminium parts.
+  measured_mass_kg: null
+  measured_inertias: null
+  paddle_mount_geometry: null
+  cad_joint_name_mapping_confirmed: false
+  cad_review: ../CAD_REVIEW.md
+  rod_axis_ball_center_offset_max_mm: 0.167250395
+  joint_names: [motor_arm_joint1, motor_arm_joint2, motor_arm_joint3]  # Provisional legacy names; CAD branch mapping pending.
   joints:
     motor_arm_joint1: {serial_number: null, can_id: null, master_id: null, direction: null, zero_rad: null, external_ratio: null}
     motor_arm_joint2: {serial_number: null, can_id: null, master_id: null, direction: null, zero_rad: null, external_ratio: null}

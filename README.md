@@ -2,7 +2,7 @@
 
 本项目使用 MuJoCo 实现 Delta 机械臂末端轨迹绘制，以及末端刚性安装乒乓球拍后的击球仿真。仓库包含运行所需的代码、场景和 CAD 网格，无需下载其他项目。
 
-实机迁移工作独立放在 [delta_real](delta_real/README.md)：已整理达妙电机手册、待确认硬件参数和 [ROS 2 sim2real pipeline](delta_real/PIPELINE.md)。当前为资料评审和实施规划阶段，真实机械尺寸及电路待提供，尚无已验证的实机驱动。
+实机迁移工作独立放在 [delta_real](delta_real/README.md)：已整理达妙电机手册、真实 STEP 的 [CAD 尺寸与坐标评审](delta_real/CAD_REVIEW.md)、待确认硬件参数和 [ROS 2 sim2real pipeline](delta_real/PIPELINE.md)。新模型主动臂约 200 mm、从动杆球心距约 393.988 mm，与当前 `delta_sim` 不同；电路、材料/质量及实物标定仍待完成，尚无已验证的实机驱动。
 
 ## 1. 准备工具
 
@@ -114,7 +114,7 @@ MuJoCo 3.6.0、种子 `20261007`、80 ms 观测延迟、2 mm 测量噪声下，�
 
 历史预演入口及其输出、旧三组十球的独立摘要已移出发布版；当前保留完整的在线 30 球参考结果。旧实验结论仍可查阅在线优化记录。
 
-下面以克隆后的仓库根目录 `delta_arm/` 为起点。所有运行命令在 `delta_sim/` 中执行。编号 CAD 零件及五种轨迹的同类输出采用花括号合并列出；例如 `{1,2,3}` 表示三个独立文件，并非实际文件名。
+下面以克隆后的仓库根目录 `delta_arm/` 为起点。上述仿真命令在 `delta_sim/` 中执行；CAD 离线工具的环境与命令见 `delta_real/CAD_REVIEW.md`。编号 CAD 零件及五种轨迹的同类输出采用花括号合并列出；例如 `{1,2,3}` 表示三个独立文件，并非实际文件名。
 
 ```text
 delta_arm/
@@ -126,7 +126,16 @@ delta_arm/
 ├── delta_real/                           # 实机迁移资料与 ROS 2 实施规划
 │   ├── README.md                         # 当前阶段和阅读顺序
 │   ├── MOTOR_MANUAL_NOTES.md              # 电机规格、CAN 协议摘要与待确认事项
+│   ├── CAD_REVIEW.md                      # 真实 STEP 的尺寸、坐标变换与材料/装配疑点
 │   ├── PIPELINE.md                        # 从电路/单电机到轨迹和在线击球的工作流程
+│   ├── import_step.py                     # 离线提取 STEP 装配和解析几何、生成预览
+│   ├── derive_geometry.py                 # 从装配特征计算连杆中心距及基座坐标
+│   ├── cad/
+│   │   ├── assembly.json                  # 各实例位姿和几何特征（mm）
+│   │   ├── parts.csv                      # 零件实例目录和几何包围尺寸
+│   │   ├── geometry.json                  # 真实 CAD 连杆/球心/关节轴及变换（m、rad）
+│   │   ├── assembly_preview.png           # STEP 实际几何预览
+│   │   └── linkage_dimensions.png         # 连杆中心与尺寸示意
 │   └── config/
 │       └── hardware_pending.yaml          # 硬件参数待填模板，不能直接加载控制电机
 └── delta_sim/

@@ -1,0 +1,322 @@
+{
+  "status": "cad_measured_not_hardware_calibrated",
+  "source_sha256": "93b8c6db575d29a76050ddd1a1d3053732322ea168e9a12c09ae7b00522e2fa0",
+  "base_frame_definition": "Origin: mean shoulder centers in upper ball midplanes; +X toward branch 1; +Z away from platform; right handed.",
+  "cad_origin_mm": [
+    62.499999999998145,
+    -28.750000000000185,
+    -108.25317547305171
+  ],
+  "rotation_base_from_cad": [
+    [
+      -0.4999999999999997,
+      0.0,
+      0.8660254037844388
+    ],
+    [
+      -1.4745881781218852e-15,
+      1.0,
+      -8.513538815825096e-16
+    ],
+    [
+      -0.8660254037844388,
+      -1.7027077631650202e-15,
+      -0.4999999999999997
+    ]
+  ],
+  "transform_base_from_cad_m": [
+    [
+      -0.4999999999999997,
+      0.0,
+      0.8660254037844388,
+      0.12499999999999636
+    ],
+    [
+      -1.4745881781218852e-15,
+      1.0,
+      -8.513538815825096e-16,
+      0.028750000000000185
+    ],
+    [
+      -0.8660254037844388,
+      -1.7027077631650202e-15,
+      -0.4999999999999997,
+      -5.684341886080802e-17
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "transform_rule": "Convert CAD coordinates mm to m first, then apply homogeneous transform.",
+  "platform_reference": "Mean of six lower spherical-surface centers; not automatically tool mounting face.",
+  "platform_reference_position_m": [
+    3.1263880373444406e-16,
+    -6.736075430412555e-16,
+    -0.422734209849199
+  ],
+  "source_lengths_unit": "mm",
+  "stored_lengths_unit": "m",
+  "branches": [
+    {
+      "cad_branch": 1,
+      "source_upper_arm_occurrence": 32,
+      "source_upper_ball_occurrences": [
+        47,
+        48
+      ],
+      "source_lower_ball_occurrences": [
+        68,
+        69
+      ],
+      "shoulder_center_m": [
+        0.12499999999999636,
+        0.00025000000000018475,
+        -7.105427357601002e-18
+      ],
+      "joint_axis": [
+        0.0,
+        -1.0,
+        1.7027077631650202e-15
+      ],
+      "upper_ball_centers_m": [
+        [
+          0.2982015782772264,
+          -0.03324999999999999,
+          -0.10000500725521769
+        ],
+        [
+          0.29820157827722643,
+          0.033750000000000016,
+          -0.10000500725521783
+        ]
+      ],
+      "lower_ball_centers_m": [
+        [
+          0.0722099153670122,
+          -0.03325000000000069,
+          -0.42273420984919935
+        ],
+        [
+          0.0722099153670122,
+          0.03374999999999964,
+          -0.42273420984919946
+        ]
+      ],
+      "platform_anchors_m": [
+        [
+          0.0722099153670119,
+          -0.033250000000000016,
+          -2.877698079828406e-16
+        ],
+        [
+          0.0722099153670119,
+          0.033750000000000314,
+          -4.014566457044566e-16
+        ]
+      ],
+      "upper_length_m": 0.19999947048389802,
+      "reference_angle_rad": -0.5236292139291449,
+      "upper_pair_spacing_m": 0.067,
+      "lower_pair_spacing_m": 0.06700000000000034,
+      "lower_lengths_m": [
+        0.393987778886441,
+        0.39398777888644104
+      ]
+    },
+    {
+      "cad_branch": 2,
+      "source_upper_arm_occurrence": 113,
+      "source_upper_ball_occurrences": [
+        49,
+        50
+      ],
+      "source_lower_ball_occurrences": [
+        70,
+        71
+      ],
+      "shoulder_center_m": [
+        -0.06228349364905211,
+        -0.10837817547305148,
+        -3.552713678800501e-18
+      ],
+      "joint_axis": [
+        -0.8660254037844386,
+        0.5000000000000002,
+        -1.4432899320127035e-15
+      ],
+      "upper_ball_centers_m": [
+        [
+          -0.17789613381444574,
+          -0.2416251422366917,
+          -0.10000500725521733
+        ],
+        [
+          -0.1198724317608883,
+          -0.2751251422366917,
+          -0.10000500725521717
+        ]
+      ],
+      "lower_ball_centers_m": [
+        [
+          -0.06490030235933847,
+          -0.045910621112956934,
+          -0.4227342098491992
+        ],
+        [
+          -0.006876600305780641,
+          -0.07941062111295777,
+          -0.4227342098491988
+        ]
+      ],
+      "platform_anchors_m": [
+        [
+          -0.0649003023593388,
+          -0.04591062111295625,
+          -1.1368683772161603e-16
+        ],
+        [
+          -0.0068766003057809675,
+          -0.0794106211129571,
+          3.5349501104064986e-16
+        ]
+      ],
+      "upper_length_m": 0.19999947048389774,
+      "reference_angle_rad": -0.5236292139291426,
+      "upper_pair_spacing_m": 0.06700000000000002,
+      "lower_pair_spacing_m": 0.06700000000000081,
+      "lower_lengths_m": [
+        0.3939877788864411,
+        0.39398777888644054
+      ]
+    },
+    {
+      "cad_branch": 3,
+      "source_upper_arm_occurrence": 150,
+      "source_upper_ball_occurrences": [
+        51,
+        52
+      ],
+      "source_lower_ball_occurrences": [
+        72,
+        73
+      ],
+      "shoulder_center_m": [
+        -0.06271650635094421,
+        0.1081281754730513,
+        -3.552713678800501e-18
+      ],
+      "joint_axis": [
+        0.8660254037844386,
+        0.5000000000000002,
+        -2.220446049250313e-16
+      ],
+      "upper_ball_centers_m": [
+        [
+          -0.12030544446278069,
+          0.2748751422366917,
+          -0.10000500725521815
+        ],
+        [
+          -0.17832914651633808,
+          0.2413751422366916,
+          -0.10000500725521806
+        ]
+      ],
+      "lower_ball_centers_m": [
+        [
+          -0.007309613007672823,
+          0.07916062111295591,
+          -0.4227342098491986
+        ],
+        [
+          -0.06533331506123073,
+          0.045660621112955824,
+          -0.4227342098491992
+        ]
+      ],
+      "platform_anchors_m": [
+        [
+          -0.007309613007673139,
+          0.07916062111295658,
+          4.2232883856740953e-16
+        ],
+        [
+          -0.06533331506123105,
+          0.045660621112956504,
+          -1.4921397450962105e-16
+        ]
+      ],
+      "upper_length_m": 0.19999947048389832,
+      "reference_angle_rad": -0.5236292139291457,
+      "upper_pair_spacing_m": 0.06700000000000003,
+      "lower_pair_spacing_m": 0.06700000000000049,
+      "lower_lengths_m": [
+        0.39398777888644065,
+        0.39398777888644104
+      ]
+    }
+  ],
+  "rod_axis_checks": [
+    {
+      "tube_occurrence": 61,
+      "endpoint_axis_distances_mm": [
+        0.16725029105477904,
+        0.16725039499932828
+      ],
+      "axis_angle_deg": 0.0016966383577958794,
+      "cad_offset_requires_review": true
+    },
+    {
+      "tube_occurrence": 62,
+      "endpoint_axis_distances_mm": [
+        0.16725029105477998,
+        0.16725039499930694
+      ],
+      "axis_angle_deg": 0.0016966383577958794,
+      "cad_offset_requires_review": true
+    },
+    {
+      "tube_occurrence": 63,
+      "endpoint_axis_distances_mm": [
+        0.16725029105440753,
+        0.16725039499908412
+      ],
+      "axis_angle_deg": 0.0016966379281642325,
+      "cad_offset_requires_review": true
+    },
+    {
+      "tube_occurrence": 64,
+      "endpoint_axis_distances_mm": [
+        0.16725029105496506,
+        0.167250394998882
+      ],
+      "axis_angle_deg": 0.0016966379281642325,
+      "cad_offset_requires_review": true
+    },
+    {
+      "tube_occurrence": 65,
+      "endpoint_axis_distances_mm": [
+        0.16725029105538847,
+        0.16725039499960664
+      ],
+      "axis_angle_deg": 0.0016966379281642325,
+      "cad_offset_requires_review": true
+    },
+    {
+      "tube_occurrence": 66,
+      "endpoint_axis_distances_mm": [
+        0.16725029105404654,
+        0.16725039499881764
+      ],
+      "axis_angle_deg": 0.0016966383577958794,
+      "cad_offset_requires_review": true
+    }
+  ],
+  "motor_to_branch_mapping": null,
+  "encoder_zero_rad": null,
+  "joint_limits_rad": null,
+  "mass_inertia_status": "STEP material assignments are not accepted; measurements needed"
+}
