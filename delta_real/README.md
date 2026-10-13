@@ -4,14 +4,16 @@
 
 建议阅读顺序：
 
-1. [CAD 评审](CAD_REVIEW.md)：真实尺寸、与旧仿真的差异、坐标系、材料及装配疑点。
-2. [电机手册解读](MOTOR_MANUAL_NOTES.md)：确认了什么、协议有哪些歧义、还需哪些资料。
-3. [实施 pipeline](PIPELINE.md)：从硬件接口冻结到 ROS 2 在线击球的分阶段任务及验收。
-4. [待确认参数表](config/hardware_pending.yaml)：记录后续需要实测或由厂家确认的参数。它是资料模板，不是 ROS 2 可加载配置，更不是上电配置。
+1. [对外待确认问题汇总](OPEN_QUESTIONS.md)：可单独转发给电机厂家、机械/电路设计人员；按编号列出依据、问题、所需附件及回复模板。
+2. [CAD 评审](CAD_REVIEW.md)：真实尺寸、与旧仿真的差异、坐标系、材料及装配疑点。
+3. [电机手册解读](MOTOR_MANUAL_NOTES.md)：确认了什么、协议有哪些歧义、还需哪些资料。
+4. [实施 pipeline](PIPELINE.md)：从硬件接口冻结到 ROS 2 在线击球的分阶段任务及验收。
+5. [待确认参数表](config/hardware_pending.yaml)：记录后续需要实测或由厂家确认的参数。它是资料模板，不是 ROS 2 可加载配置，更不是上电配置。
 
 ```text
 delta_real/
 ├── README.md                     # 当前状态、阅读顺序与文件用途
+├── OPEN_QUESTIONS.md             # 对外询问清单：电机/CAD/电路疑点、附件和回复模板
 ├── MOTOR_MANUAL_NOTES.md          # 九页电机手册的技术摘要、页码和疑点
 ├── CAD_REVIEW.md                  # 新 STEP 的尺寸、坐标与问题评审
 ├── PIPELINE.md                   # ROS 2 / ros2_control 架构、实施步骤与验收

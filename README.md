@@ -4,6 +4,8 @@
 
 实机迁移工作独立放在 [delta_real](delta_real/README.md)：已整理达妙电机手册、真实 STEP 的 [CAD 尺寸与坐标评审](delta_real/CAD_REVIEW.md)、待确认硬件参数和 [ROS 2 sim2real pipeline](delta_real/PIPELINE.md)。新模型主动臂约 200 mm、从动杆球心距约 393.988 mm，与当前 `delta_sim` 不同；电路、材料/质量及实物标定仍待完成，尚无已验证的实机驱动。
 
+电机、CAD 和电路的疑点已集中在 [对外待确认问题汇总](delta_real/OPEN_QUESTIONS.md)，可单独转发，包含问题编号、资料依据、所需附件和回复模板。
+
 ## 1. 准备工具
 
 安装 [Git](https://git-scm.com/downloads/win) 和 [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install)。打开支持 Conda 的 PowerShell 终端，确认以下命令可用：
@@ -125,6 +127,7 @@ delta_arm/
 ├── ONLINE_OPTIMIZATION.md                # 在线控制优化过程、验证结果和指标边界
 ├── delta_real/                           # 实机迁移资料与 ROS 2 实施规划
 │   ├── README.md                         # 当前阶段和阅读顺序
+│   ├── OPEN_QUESTIONS.md                  # 可转发的电机/CAD/电路疑点清单与回复模板
 │   ├── MOTOR_MANUAL_NOTES.md              # 电机规格、CAN 协议摘要与待确认事项
 │   ├── CAD_REVIEW.md                      # 真实 STEP 的尺寸、坐标变换与材料/装配疑点
 │   ├── PIPELINE.md                        # 从电路/单电机到轨迹和在线击球的工作流程
